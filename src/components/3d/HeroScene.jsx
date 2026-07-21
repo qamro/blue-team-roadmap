@@ -1,140 +1,301 @@
-import { useRef, useMemo } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { Sphere, Ring, Torus, Points, PointMaterial } from '@react-three/drei'
+import { useRef, useMemo, useEffect } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Points, PointMaterial, Sphere, Torus, Ring } from '@react-three/drei'
 import * as THREE from 'three'
 
-// ── Floating particles ────────────────────────────────────────
-function Particles({ count = 2000 }) {
+// ── Mouse-reactive camera ─────────────────────────────────────
+function CameraRig() {
+  const { camera } = useThree()
+  const mouse = useRef({ x: 0, y: 0 })
+
+  useEffect(() => {
+    const onMove = (e) => {
+      mouse.current.x = (e.clientX / window.innerWidth  - 0.5) * 2
+      mouse.current.y = (e.clientY / window.innerHeight - 0.5) * 2
+    }
+    window.addEventListener('mousemove', onMove)
+    return () => window.removeEventListener('mousemove', onMove)
+  }, [])
+
+  useFrame(() => {
+    camera.position.x += (mouse.current.x * 0.8 - camera.position.x) * 0.04
+    camera.position.y += (-mouse.current.y * 0.5 - camera.position.y) * 0.04
+    camera.lookAt(0, 0, 0)
+  })
+  return null
+}
+
+// ── Dense star field ──────────────────────────────────────────
+function StarField() {
   const ref = useRef()
+  const count = 3000
 
   const positions = useMemo(() => {
     const pos = new Float32Array(count * 3)
     for (let i = 0; i < count; i++) {
-      const r     = 2.5 + Math.random() * 4
-      const theta = Math.random() * Math.PI * 2
-      const phi   = Math.acos(2 * Math.random() - 1)
-      pos[i * 3]     = r * Math.sin(phi) * Math.cos(theta)
-      pos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta)
-      pos[i * 3 + 2] = r * Math.cos(phi)
+      pos[i * 3]     = (Math.random() - 0.5) * 40
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 40
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 40
     }
     return pos
-  }, [count])
+  }, [])
 
-  useFrame((state) => {
-    if (ref.current) {
-      ref.current.rotation.y = state.clock.elapsedTime * 0.04
-      ref.current.rotation.x = state.clock.elapsedTime * 0.02
-    }
+  useFrame((s) => {
+    if (ref.current) ref.current.rotation.y = s.clock.elapsedTime * 0.01
   })
 
   return (
     <Points ref={ref} positions={positions} stride={3}>
-      <PointMaterial
-        transparent
-        color="#00F5FF"
-        size={0.012}
-        sizeAttenuation
-        depthWrite={false}
-        opacity={0.6}
-      />
+      <PointMaterial transparent color="#A8D4FF" size={0.04} sizeAttenuation depthWrite={false} opacity={0.6} />
     </Points>
   )
 }
 
-// ── Core glowing sphere ───────────────────────────────────────
-function CyberSphere() {
-  const meshRef    = useRef()
-  const glowRef    = useRef()
-  const ringRef1   = useRef()
-  const ringRef2   = useRef()
-  const ringRef3   = useRef()
+// ── Floating hex particles ────────────────────────────────────
+function HexParticles() {
+  const groupRef = useRef()
+  const count = 60
 
-  useFrame((state) => {
-    const t = state.clock.elapsedTime
+  const particles = useMemo(() =>
+    Array.from({ length: count }, () => ({
+      pos:   [
+        (Math.random() - 0.5) * 14,
+        (Math.random() - 0.5) * 10,
+        (Math.random() - 0.5) * 8 - 2,
+      ],
+      speed: 0.2 + Math.random() * 0.6,
+      phase: Math.random() * Math.PI * 2,
+      size:  0.015 + Math.random() * 0.04,
+      color: Math.random() > 0.6 ? '#00F5FF' : Math.random() > 0.5 ? '#0066FF' : '#00A3FF',
+    })),
+  [])
 
-    if (meshRef.current) {
-      meshRef.current.rotation.y = t * 0.15
-      meshRef.current.rotation.x = Math.sin(t * 0.1) * 0.1
+  useFrame((s) => {
+    const t = s.clock.elapsedTime
+    if (!groupRef.current) return
+    groupRef.current.children.forEach((child, i) => {
+      const p = particles[i]
+      child.position.y = p.pos[1] + Math.sin(t * p.speed + p.phase) * 0.6
+      child.position.x = p.pos[0] + Math.cos(t * p.speed * 0.5 + p.phase) * 0.2
+      child.material.opacity = 0.4 + Math.sin(t * p.speed + p.phase) * 0.3
+    })
+  })
+
+  return (
+    <group ref={groupRef}>
+      {particles.map((p, i) => (
+        <mesh key={i} position={p.pos}>
+          <sphereGeometry args={[p.size, 6, 6]} />
+          <meshBasicMaterial color={p.color} transparent opacity={0.6} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+// ── Core cyber shield ─────────────────────────────────────────
+function CyberShield() {
+  const groupRef  = useRef()
+  const coreRef   = useRef()
+  const pulseRef  = useRef()
+  const ring1Ref  = useRef()
+  const ring2Ref  = useRef()
+  const ring3Ref  = useRef()
+  const ring4Ref  = useRef()
+  const energyRef = useRef()
+
+  useFrame((s) => {
+    const t = s.clock.elapsedTime
+
+    if (groupRef.current) {
+      groupRef.current.rotation.y = t * 0.12
     }
-    if (glowRef.current) {
-      const s = 1 + Math.sin(t * 1.5) * 0.05
-      glowRef.current.scale.set(s, s, s)
+    if (coreRef.current) {
+      const sc = 1 + Math.sin(t * 1.8) * 0.03
+      coreRef.current.scale.set(sc, sc, sc)
     }
-    if (ringRef1.current) {
-      ringRef1.current.rotation.x = t * 0.3
-      ringRef1.current.rotation.z = t * 0.2
+    if (pulseRef.current) {
+      const ps = 1 + Math.sin(t * 1.2) * 0.12
+      pulseRef.current.scale.set(ps, ps, ps)
+      pulseRef.current.material.opacity = 0.06 + Math.sin(t * 1.2) * 0.04
     }
-    if (ringRef2.current) {
-      ringRef2.current.rotation.y = t * 0.4
-      ringRef2.current.rotation.x = Math.PI / 3
+    if (ring1Ref.current) {
+      ring1Ref.current.rotation.x = t * 0.5
+      ring1Ref.current.rotation.z = t * 0.3
     }
-    if (ringRef3.current) {
-      ringRef3.current.rotation.z = -t * 0.25
-      ringRef3.current.rotation.y = Math.PI / 4
+    if (ring2Ref.current) {
+      ring2Ref.current.rotation.y = t * 0.4
+      ring2Ref.current.rotation.x = Math.PI / 2.5 + t * 0.2
+    }
+    if (ring3Ref.current) {
+      ring3Ref.current.rotation.z = -t * 0.35
+      ring3Ref.current.rotation.y = t * 0.15
+    }
+    if (ring4Ref.current) {
+      ring4Ref.current.rotation.x = Math.PI / 3
+      ring4Ref.current.rotation.z = t * 0.25
+    }
+    if (energyRef.current) {
+      const es = 1 + Math.sin(t * 0.8) * 0.08
+      energyRef.current.scale.set(es, es, es)
+      energyRef.current.material.opacity = 0.03 + Math.sin(t * 0.8) * 0.02
     }
   })
 
   return (
-    <group>
+    <group ref={groupRef} position={[2.5, 0, 0]}>
+      {/* Energy field (outermost) */}
+      <Sphere ref={energyRef} args={[3.5, 32, 32]}>
+        <meshBasicMaterial color="#0033AA" transparent opacity={0.04} side={THREE.BackSide} />
+      </Sphere>
+
+      {/* Atmosphere glow */}
+      <Sphere args={[2.6, 32, 32]}>
+        <meshBasicMaterial color="#0066FF" transparent opacity={0.05} side={THREE.BackSide} />
+      </Sphere>
+
       {/* Core sphere */}
-      <Sphere ref={meshRef} args={[1.2, 64, 64]}>
+      <Sphere ref={coreRef} args={[1.0, 64, 64]}>
         <meshStandardMaterial
-          color="#001133"
+          color="#000D22"
           emissive="#003399"
-          emissiveIntensity={0.3}
-          wireframe={false}
-          roughness={0.1}
-          metalness={0.9}
+          emissiveIntensity={0.6}
+          roughness={0.05}
+          metalness={0.95}
         />
       </Sphere>
 
       {/* Wireframe overlay */}
-      <Sphere args={[1.22, 24, 24]}>
-        <meshBasicMaterial
-          color="#00F5FF"
-          wireframe
-          transparent
-          opacity={0.08}
-        />
+      <Sphere args={[1.02, 20, 20]}>
+        <meshBasicMaterial color="#00F5FF" wireframe transparent opacity={0.06} />
       </Sphere>
 
-      {/* Glow sphere */}
-      <Sphere ref={glowRef} args={[1.4, 32, 32]}>
-        <meshBasicMaterial
-          color="#0066FF"
-          transparent
-          opacity={0.04}
-          side={THREE.BackSide}
-        />
-      </Sphere>
-
-      {/* Outer atmosphere */}
-      <Sphere args={[1.8, 32, 32]}>
-        <meshBasicMaterial
-          color="#00F5FF"
-          transparent
-          opacity={0.015}
-          side={THREE.BackSide}
-        />
+      {/* Pulse sphere */}
+      <Sphere ref={pulseRef} args={[1.3, 32, 32]}>
+        <meshBasicMaterial color="#00A3FF" transparent opacity={0.07} side={THREE.BackSide} />
       </Sphere>
 
       {/* Orbital rings */}
-      <Torus ref={ringRef1} args={[1.8, 0.006, 16, 200]}>
-        <meshBasicMaterial color="#00F5FF" transparent opacity={0.5} />
+      <Torus ref={ring1Ref} args={[1.7, 0.008, 16, 300]}>
+        <meshBasicMaterial color="#00F5FF" transparent opacity={0.7} />
       </Torus>
-      <Torus ref={ringRef2} args={[2.2, 0.004, 16, 200]}>
-        <meshBasicMaterial color="#0066FF" transparent opacity={0.4} />
+      <Torus ref={ring2Ref} args={[2.1, 0.005, 16, 300]}>
+        <meshBasicMaterial color="#0088FF" transparent opacity={0.5} />
       </Torus>
-      <Torus ref={ringRef3} args={[2.6, 0.003, 16, 200]}>
-        <meshBasicMaterial color="#00A3FF" transparent opacity={0.3} />
+      <Torus ref={ring3Ref} args={[2.5, 0.004, 16, 300]}>
+        <meshBasicMaterial color="#00CCFF" transparent opacity={0.4} />
+      </Torus>
+      <Torus ref={ring4Ref} args={[2.9, 0.003, 16, 300]}>
+        <meshBasicMaterial color="#0055FF" transparent opacity={0.25} />
       </Torus>
 
-      {/* Equatorial ring (static) */}
-      <Ring args={[1.75, 1.80, 128]}>
+      {/* Equatorial ring bright */}
+      <Ring args={[1.65, 1.72, 128]} rotation={[Math.PI / 2, 0, 0]}>
+        <meshBasicMaterial color="#00F5FF" transparent opacity={0.4} side={THREE.DoubleSide} />
+      </Ring>
+
+      {/* Orbiting data nodes */}
+      <OrbitingNodes />
+    </group>
+  )
+}
+
+// ── Orbiting nodes around shield ──────────────────────────────
+function OrbitingNodes() {
+  const groupRef = useRef()
+
+  const nodes = useMemo(() =>
+    Array.from({ length: 8 }, (_, i) => ({
+      angle:  (i / 8) * Math.PI * 2,
+      radius: 1.7 + (i % 3) * 0.4,
+      tilt:   (i % 4) * (Math.PI / 4),
+      speed:  0.15 + (i % 3) * 0.1,
+      size:   0.04 + (i % 3) * 0.025,
+      color:  i % 3 === 0 ? '#00F5FF' : i % 3 === 1 ? '#0066FF' : '#00D4FF',
+    })),
+  [])
+
+  useFrame((s) => {
+    const t = s.clock.elapsedTime
+    if (!groupRef.current) return
+    groupRef.current.children.forEach((child, i) => {
+      const n     = nodes[i]
+      const angle = n.angle + t * n.speed
+      child.position.x = Math.cos(angle) * n.radius
+      child.position.z = Math.sin(angle) * n.radius
+      child.position.y = Math.sin(angle * 0.5 + n.tilt) * 0.5
+    })
+  })
+
+  return (
+    <group ref={groupRef}>
+      {nodes.map((n, i) => (
+        <mesh key={i}>
+          <sphereGeometry args={[n.size, 8, 8]} />
+          <meshBasicMaterial color={n.color} transparent opacity={0.9} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+// ── Floating data stream lines ────────────────────────────────
+function DataStreams() {
+  const lines = useMemo(() => {
+    return Array.from({ length: 12 }, (_, i) => {
+      const points = []
+      const startX = -8 + Math.random() * 4
+      const startY = (Math.random() - 0.5) * 6
+      const startZ = (Math.random() - 0.5) * 4
+      for (let j = 0; j < 20; j++) {
+        points.push(new THREE.Vector3(
+          startX + j * 0.8 + Math.sin(j * 0.5) * 0.3,
+          startY + Math.sin(j * 0.3 + i) * 0.2,
+          startZ + Math.cos(j * 0.4) * 0.2,
+        ))
+      }
+      return { points, color: i % 3 === 0 ? '#00F5FF' : '#0044BB', opacity: 0.1 + Math.random() * 0.2 }
+    })
+  }, [])
+
+  const refs = useRef(lines.map(() => null))
+
+  useFrame((s) => {
+    const t = s.clock.elapsedTime
+    refs.current.forEach((ref, i) => {
+      if (ref) ref.material.opacity = (lines[i].opacity + Math.sin(t * 0.5 + i) * 0.1)
+    })
+  })
+
+  return (
+    <>
+      {lines.map((line, i) => {
+        const geometry = new THREE.BufferGeometry().setFromPoints(line.points)
+        return (
+          <line key={i} ref={el => refs.current[i] = el} geometry={geometry}>
+            <lineBasicMaterial color={line.color} transparent opacity={line.opacity} />
+          </line>
+        )
+      })}
+    </>
+  )
+}
+
+// ── Scanning radar ring ───────────────────────────────────────
+function RadarScan() {
+  const ref = useRef()
+
+  useFrame((s) => {
+    if (ref.current) ref.current.rotation.z = s.clock.elapsedTime * 0.8
+  })
+
+  return (
+    <group position={[2.5, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+      <Ring ref={ref} args={[0, 3.5, 64]} rotation={[0, 0, 0]}>
         <meshBasicMaterial
           color="#00F5FF"
           transparent
-          opacity={0.3}
+          opacity={0.04}
           side={THREE.DoubleSide}
         />
       </Ring>
@@ -142,107 +303,29 @@ function CyberSphere() {
   )
 }
 
-// ── Floating data nodes ───────────────────────────────────────
-function DataNodes() {
-  const groupRef = useRef()
-
-  const nodes = useMemo(() =>
-    Array.from({ length: 12 }, (_, i) => ({
-      angle: (i / 12) * Math.PI * 2,
-      r:     2.8 + Math.random() * 0.5,
-      y:     (Math.random() - 0.5) * 2,
-      speed: 0.1 + Math.random() * 0.2,
-      size:  0.03 + Math.random() * 0.04,
-    })),
-  [])
-
-  useFrame((state) => {
-    const t = state.clock.elapsedTime
-    if (groupRef.current) {
-      groupRef.current.children.forEach((child, i) => {
-        const node  = nodes[i]
-        const angle = node.angle + t * node.speed
-        child.position.x = Math.cos(angle) * node.r
-        child.position.z = Math.sin(angle) * node.r
-        child.position.y = node.y + Math.sin(t * 0.5 + i) * 0.2
-      })
-    }
-  })
-
-  return (
-    <group ref={groupRef}>
-      {nodes.map((node, i) => (
-        <mesh key={i}>
-          <sphereGeometry args={[node.size, 8, 8]} />
-          <meshBasicMaterial
-            color={i % 3 === 0 ? '#00F5FF' : i % 3 === 1 ? '#0066FF' : '#00A3FF'}
-            transparent
-            opacity={0.8}
-          />
-        </mesh>
-      ))}
-    </group>
-  )
-}
-
-// ── Grid plane ───────────────────────────────────────────────
-function GridPlane() {
-  const ref = useRef()
-
-  useFrame((state) => {
-    if (ref.current) {
-      ref.current.position.y = -3 + (state.clock.elapsedTime * 0.1 % 1) * 0.5
-    }
-  })
-
-  return (
-    <gridHelper
-      ref={ref}
-      args={[30, 30, '#002244', '#001133']}
-      position={[0, -3, 0]}
-    />
-  )
-}
-
-// ── Main scene ───────────────────────────────────────────────
-function Scene() {
-  const groupRef = useRef()
-
-  useFrame((state) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y = state.clock.elapsedTime * 0.05
-    }
-  })
-
-  return (
-    <>
-      {/* Lights */}
-      <ambientLight intensity={0.2} />
-      <pointLight position={[5, 5, 5]}   color="#0066FF" intensity={2} />
-      <pointLight position={[-5, -5, 5]} color="#00F5FF" intensity={1.5} />
-      <pointLight position={[0, 0, 8]}   color="#ffffff" intensity={0.5} />
-
-      {/* Scene content */}
-      <group ref={groupRef}>
-        <CyberSphere />
-        <DataNodes />
-      </group>
-      <Particles />
-      <GridPlane />
-    </>
-  )
-}
-
-// ── Exported canvas ───────────────────────────────────────────
+// ── Main exported canvas ──────────────────────────────────────
 export default function HeroScene() {
   return (
     <Canvas
-      camera={{ position: [0, 0, 6], fov: 50 }}
-      gl={{ antialias: true, alpha: true }}
+      camera={{ position: [0, 0, 8], fov: 45 }}
+      gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
       style={{ background: 'transparent' }}
-      dpr={[1, 1.5]}
+      dpr={[1, 2]}
     >
-      <Scene />
+      <CameraRig />
+
+      {/* Lights */}
+      <ambientLight intensity={0.15} />
+      <pointLight position={[4, 4, 4]}   color="#0066FF" intensity={3} />
+      <pointLight position={[-4, -2, 4]} color="#00F5FF" intensity={2} />
+      <pointLight position={[0, 0, 10]}  color="#ffffff" intensity={0.4} />
+      <pointLight position={[2.5, 0, 0]} color="#00D4FF" intensity={4} distance={6} />
+
+      <StarField />
+      <HexParticles />
+      <CyberShield />
+      <DataStreams />
+      <RadarScan />
     </Canvas>
   )
 }
