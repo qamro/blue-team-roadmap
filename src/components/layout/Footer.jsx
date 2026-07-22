@@ -71,7 +71,7 @@ export default function Footer() {
             Developed by 
             <span style={{ color: "red" }}>
                 Bakhouche Mohamed Qamar Eddine
-            </span>{" "}
+            </span>
 
           </div>
         </div>
