@@ -70,7 +70,7 @@ export default function Footer() {
           <div className="text-xs text-blue-400/20">
             Developed by 
             <span style={{ color: "red" }}>
-              This sentence is red.
+                Bakhouche Mohamed Qamar Eddine
             </span>{" "}
 
           </div>
