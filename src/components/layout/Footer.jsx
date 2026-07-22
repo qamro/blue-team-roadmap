@@ -68,7 +68,7 @@ export default function Footer() {
             ))}
           </div>
           <div className="text-xs text-blue-400/20">
-            Made with ❤️ for defenders everywhere
+            Developed by <span style="color: red;">Bakhouche Mohamed Qamar Eddine.</span>
           </div>
         </div>
       </div>
