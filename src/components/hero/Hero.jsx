@@ -153,7 +153,7 @@ function MiniTerminal() {
           ))}
         </div>
         <span className="text-[9px] font-mono text-white/20 ml-2 flex-1">soc@blueteam:~</span>
-        <span className="text-[9px] font-mono text-green-400">● LIVE</span>
+        <span className="text-[9px] font-mono text-green-400/50">● LIVE</span>
       </div>
       <div className="p-4 space-y-1.5" style={{ minHeight: 190 }}>
         {TERM.slice(0, shown).map((line, i) => (
