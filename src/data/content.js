@@ -169,16 +169,16 @@ export const ROADMAP = [
 
 // ── Certifications ────────────────────────────────────────────
 export const CERTS = [
-  { name: 'CompTIA Security+',    level: 'Entry',        color: '#0066FF', org: 'CompTIA',   time: '2-3 months' },
-  { name: 'CompTIA CySA+',       level: 'Intermediate', color: '#0088FF', org: 'CompTIA',   time: '3-4 months' },
-  { name: 'BTL1',                 level: 'Entry',        color: '#00AAFF', org: 'Security Blue Team', time: '1-2 months' },
-  { name: 'BTL2',                 level: 'Advanced',     color: '#00BBFF', org: 'Security Blue Team', time: '3-6 months' },
-  { name: 'GCIA',                 level: 'Advanced',     color: '#00CCFF', org: 'GIAC',      time: '4-6 months' },
-  { name: 'GCIH',                 level: 'Advanced',     color: '#00DDFF', org: 'GIAC',      time: '4-6 months' },
-  { name: 'SC-200',               level: 'Intermediate', color: '#00EEFF', org: 'Microsoft', time: '2-3 months' },
-  { name: 'SC-100',               level: 'Expert',       color: '#00F5FF', org: 'Microsoft', time: '4-6 months' },
-  { name: 'GCFE',                 level: 'Advanced',     color: '#22D3EE', org: 'GIAC',      time: '3-5 months' },
-  { name: 'CEH',                  level: 'Intermediate', color: '#38BDF8', org: 'EC-Council', time: '3-4 months' },
+  { name: 'CompTIA Security+',    level: 'Entry',        color: '#0066FF', org: 'CompTIA',            time: '2-3 months', url: 'https://www.comptia.org/certifications/security' },
+  { name: 'CompTIA CySA+',       level: 'Intermediate', color: '#0088FF', org: 'CompTIA',            time: '3-4 months', url: 'https://www.comptia.org/certifications/cybersecurity-analyst' },
+  { name: 'BTL1',                 level: 'Entry',        color: '#00AAFF', org: 'Security Blue Team', time: '1-2 months', url: 'https://www.securityblue.team/certifications/btl1' },
+  { name: 'BTL2',                 level: 'Advanced',     color: '#00BBFF', org: 'Security Blue Team', time: '3-6 months', url: 'https://www.securityblue.team/certifications/btl2' },
+  { name: 'GCIA',                 level: 'Advanced',     color: '#00CCFF', org: 'GIAC',               time: '4-6 months', url: 'https://www.giac.org/certifications/certified-intrusion-analyst-gcia' },
+  { name: 'GCIH',                 level: 'Advanced',     color: '#00DDFF', org: 'GIAC',               time: '4-6 months', url: 'https://www.giac.org/certifications/certified-incident-handler-gcih' },
+  { name: 'SC-200',               level: 'Intermediate', color: '#00EEFF', org: 'Microsoft',          time: '2-3 months', url: 'https://learn.microsoft.com/en-us/credentials/certifications/security-operations-analyst' },
+  { name: 'SC-100',               level: 'Expert',       color: '#00F5FF', org: 'Microsoft',          time: '4-6 months', url: 'https://learn.microsoft.com/en-us/credentials/certifications/cybersecurity-architect-expert' },
+  { name: 'GCFE',                 level: 'Advanced',     color: '#22D3EE', org: 'GIAC',               time: '3-5 months', url: 'https://www.giac.org/certifications/certified-forensic-examiner-gcfe' },
+  { name: 'CEH',                  level: 'Intermediate', color: '#38BDF8', org: 'EC-Council',         time: '3-4 months', url: 'https://www.eccouncil.org/train-certify/certified-ethical-hacker-ceh' },
 ]
 
 // ── Labs & Platforms ──────────────────────────────────────────
