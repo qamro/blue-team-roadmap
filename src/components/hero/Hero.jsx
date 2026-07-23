@@ -1,126 +1,167 @@
-import { useEffect, useRef, useState, Suspense, lazy } from 'react'
-import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion'
+import { useRef, useState, useEffect, Suspense, lazy } from 'react'
+import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion'
 import { useMagnetic } from '../../hooks/useMagnetic'
 
 const HeroScene = lazy(() => import('../3d/HeroScene'))
 
 // ── Typing animation ──────────────────────────────────────────
-const ROLES = ['SOC Analyst', 'Threat Hunter', 'IR Specialist', 'Forensics Expert', 'Detection Engineer']
+const ROLES = ['SOC Analyst', 'Threat Hunter', 'IR Specialist', 'Forensics Expert', 'Detection Engineer', 'Blue Teamer']
 
 function TypedRole() {
   const [idx,  setIdx]  = useState(0)
   const [text, setText] = useState('')
   const [del,  setDel]  = useState(false)
-
   useEffect(() => {
     const word = ROLES[idx]
-    const timeout = setTimeout(() => {
+    const t = setTimeout(() => {
       if (!del && text.length < word.length) setText(word.slice(0, text.length + 1))
-      else if (!del && text.length === word.length) setTimeout(() => setDel(true), 2000)
+      else if (!del) setTimeout(() => setDel(true), 1800)
       else if (del && text.length > 0) setText(text.slice(0, -1))
-      else if (del && text.length === 0) { setDel(false); setIdx((i) => (i + 1) % ROLES.length) }
-    }, del ? 35 : 80)
-    return () => clearTimeout(timeout)
+      else { setDel(false); setIdx(i => (i + 1) % ROLES.length) }
+    }, del ? 30 : 75)
+    return () => clearTimeout(t)
   }, [text, del, idx])
-
   return (
     <span>
-      <span className="text-cyan-400">{text}</span>
-      <span className="inline-block w-[2px] h-7 bg-cyan-400 align-middle ml-0.5 animate-[blink_1s_ease-in-out_infinite]" />
+      <span style={{ color: '#00F5FF' }}>{text}</span>
+      <span className="inline-block w-[2px] h-[0.85em] bg-cyan-400 align-middle ml-0.5"
+        style={{ animation: 'blink 1s ease-in-out infinite' }} />
     </span>
   )
 }
 
-// ── Live threat feed ──────────────────────────────────────────
-const THREATS = [
-  { level: 'CRIT', color: '#FF4444', msg: 'APT29 Spearphishing Campaign Detected' },
-  { level: 'HIGH', color: '#FF8800', msg: 'Lateral Movement — Domain Controller' },
-  { level: 'MED',  color: '#FFD700', msg: 'Sigma Rule T1055 Matched — Injection' },
-  { level: 'CRIT', color: '#FF4444', msg: 'Ransomware IOC Blocked — Endpoint-07' },
-  { level: 'INFO', color: '#00F5FF', msg: 'Threat Hunt Complete — Environment Clean' },
-  { level: 'HIGH', color: '#FF8800', msg: 'Suspicious PowerShell — WS-214' },
-  { level: 'CRIT', color: '#FF4444', msg: 'C2 Beacon Detected — Cobalt Strike' },
-  { level: 'MED',  color: '#FFD700', msg: 'LSASS Access Attempt — T1003.001' },
-  { level: 'INFO', color: '#00F5FF', msg: 'Incident Contained — IR Team Responded' },
-  { level: 'HIGH', color: '#FF8800', msg: 'New CVE-2025-1337 — Patch Deployed' },
+// ── Alert ticker ──────────────────────────────────────────────
+const ALERTS = [
+  { sev: 'CRIT', col: '#FF3333', msg: 'APT29 Spearphishing — Finance Dept' },
+  { sev: 'HIGH', col: '#FF8800', msg: 'Lateral Movement — DC01 Compromised' },
+  { sev: 'CRIT', col: '#FF3333', msg: 'Cobalt Strike C2 Beacon — WS-142'  },
+  { sev: 'MED',  col: '#FFD700', msg: 'LSASS Dump Attempt — T1003.001'     },
+  { sev: 'HIGH', col: '#FF8800', msg: 'Kerberoasting Detected — AD-01'     },
+  { sev: 'INFO', col: '#00F5FF', msg: 'Threat Hunt Complete — Clean'        },
+  { sev: 'CRIT', col: '#FF3333', msg: 'Ransomware IOC Blocked — Endpoint'  },
 ]
 
-function ThreatFeed() {
-  const [active, setActive] = useState(0)
+function AlertTicker() {
+  const [idx, setIdx] = useState(0)
   useEffect(() => {
-    const id = setInterval(() => setActive(a => (a + 1) % THREATS.length), 2200)
+    const id = setInterval(() => setIdx(i => (i + 1) % ALERTS.length), 2500)
     return () => clearInterval(id)
   }, [])
-  const t = THREATS[active]
+  const a = ALERTS[idx]
   return (
-    <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-white/5 bg-black/30 backdrop-blur-sm overflow-hidden" style={{ minWidth: 320 }}>
-      <div className="flex items-center gap-2 shrink-0">
-        <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: t.color, boxShadow: `0 0 6px ${t.color}` }} />
-        <span className="text-[9px] font-mono font-bold" style={{ color: t.color }}>{t.level}</span>
-      </div>
+    <div className="flex items-center gap-3">
+      <span className="text-[9px] font-mono font-bold tracking-widest text-white/30 uppercase shrink-0">LIVE SOC</span>
+      <div className="w-px h-3 bg-white/10 shrink-0" />
       <AnimatePresence mode="wait">
-        <motion.span
-          key={active}
-          className="text-[11px] font-mono text-white/50 truncate"
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.3 }}
-        >
-          {t.msg}
-        </motion.span>
+        <motion.div key={idx} className="flex items-center gap-2"
+          initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
+          transition={{ duration: 0.25 }}>
+          <span className="w-1.5 h-1.5 rounded-full shrink-0 animate-pulse" style={{ background: a.col, boxShadow: `0 0 6px ${a.col}` }} />
+          <span className="text-[10px] font-mono font-bold shrink-0" style={{ color: a.col }}>{a.sev}</span>
+          <span className="text-[10px] font-mono text-white/40 truncate max-w-[260px]">{a.msg}</span>
+        </motion.div>
       </AnimatePresence>
     </div>
   )
 }
 
-// ── Terminal window ───────────────────────────────────────────
-const TERMINAL_LINES = [
-  { delay: 0.5,  color: '#00F5FF', text: '$ soc-monitor --status' },
-  { delay: 1.2,  color: '#7EC88A', text: '✓ SIEM Connected — Splunk Enterprise' },
-  { delay: 1.9,  color: '#7EC88A', text: '✓ EDR Active — 2,847 endpoints' },
-  { delay: 2.6,  color: '#7EC88A', text: '✓ Threat Intel Feed — MISP Online' },
-  { delay: 3.3,  color: '#FFD700', text: '⚡ 247 alerts triaged today' },
-  { delay: 4.0,  color: '#00F5FF', text: '$ mitre-navigator --coverage' },
-  { delay: 4.7,  color: '#7EC88A', text: '✓ ATT&CK Coverage: 94.2%' },
-  { delay: 5.4,  color: '#00F5FF', text: '$ threat-hunt --hypothesis active' },
-  { delay: 6.1,  color: '#A78BFA', text: '→ Hunting: T1055 Process Injection...' },
+// ── Stat counter ──────────────────────────────────────────────
+function StatPill({ val, label, color = '#00F5FF' }) {
+  return (
+    <div className="flex flex-col items-center px-5 py-3 rounded-xl border border-white/6"
+      style={{ background: 'rgba(0,10,30,0.6)', backdropFilter: 'blur(20px)' }}>
+      <span className="text-xl font-black" style={{ color }}>{val}</span>
+      <span className="text-[9px] font-mono text-white/30 uppercase tracking-wider mt-0.5">{label}</span>
+    </div>
+  )
+}
+
+// ── HUD corner decoration ─────────────────────────────────────
+function Corner({ pos }) {
+  const cls = {
+    tl: 'top-0 left-0 border-t-2 border-l-2 rounded-tl-xl',
+    tr: 'top-0 right-0 border-t-2 border-r-2 rounded-tr-xl',
+    bl: 'bottom-0 left-0 border-b-2 border-l-2 rounded-bl-xl',
+    br: 'bottom-0 right-0 border-b-2 border-r-2 rounded-br-xl',
+  }[pos]
+  return <div className={`absolute w-6 h-6 ${cls} border-cyan-400/30`} />
+}
+
+// ── Floating metric card ──────────────────────────────────────
+function MetricCard({ icon, label, value, sub, color, delay, x, y }) {
+  return (
+    <motion.div
+      className="absolute hidden lg:block"
+      style={{ left: x, top: y }}
+      initial={{ opacity: 0, scale: 0.7, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ delay, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <motion.div
+        className="flex items-center gap-3 px-4 py-3 rounded-2xl border"
+        style={{
+          background: 'rgba(2,5,18,0.88)',
+          backdropFilter: 'blur(24px)',
+          borderColor: color + '25',
+          boxShadow: `0 0 24px ${color}10`,
+        }}
+        animate={{ y: [0, -6, 0] }}
+        transition={{ duration: 3.5 + delay, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0"
+          style={{ background: color + '18', border: `1px solid ${color}30` }}>
+          {icon}
+        </div>
+        <div>
+          <div className="text-[9px] font-mono uppercase tracking-wider" style={{ color: color + '80' }}>{label}</div>
+          <div className="text-sm font-bold text-white leading-tight">{value}</div>
+          {sub && <div className="text-[9px] text-white/30 mt-0.5">{sub}</div>}
+        </div>
+        <div className="w-1.5 h-1.5 rounded-full animate-pulse ml-1 shrink-0" style={{ background: color }} />
+      </motion.div>
+    </motion.div>
+  )
+}
+
+// ── Terminal lines ────────────────────────────────────────────
+const TERM = [
+  { d: 0.8,  c: '#00F5FF', t: '$ siem-connect --host splunk-prod' },
+  { d: 1.5,  c: '#00FF88', t: '✓ Connected — 2,847 endpoints online' },
+  { d: 2.2,  c: '#00F5FF', t: '$ threat-intel --feed MISP,OTX' },
+  { d: 2.9,  c: '#00FF88', t: '✓ 14,203 IOCs loaded — TLP:GREEN' },
+  { d: 3.6,  c: '#FFD700', t: '⚡ alert-triage --queue 247' },
+  { d: 4.3,  c: '#00F5FF', t: '$ hunt --hypothesis "T1055 Injection"' },
+  { d: 5.0,  c: '#A78BFA', t: '→ Scanning 2,847 endpoints...' },
+  { d: 5.7,  c: '#00FF88', t: '✓ MITRE coverage: 94.2% — shields UP' },
 ]
 
-function TerminalWidget() {
+function MiniTerminal() {
   const [shown, setShown] = useState(0)
   useEffect(() => {
-    if (shown >= TERMINAL_LINES.length) return
-    const t = setTimeout(() => setShown(s => s + 1), TERMINAL_LINES[shown]?.delay * 1000 || 500)
+    if (shown >= TERM.length) return
+    const t = setTimeout(() => setShown(s => s + 1), TERM[shown].d * 1000)
     return () => clearTimeout(t)
   }, [shown])
-
   return (
-    <div className="relative rounded-2xl overflow-hidden border border-white/8"
-      style={{ background: 'rgba(2,8,20,0.95)', backdropFilter: 'blur(20px)' }}>
+    <div className="rounded-2xl overflow-hidden border border-white/8"
+      style={{ background: 'rgba(1,4,14,0.95)', backdropFilter: 'blur(24px)' }}>
       {/* Title bar */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5">
+      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5">
         <div className="flex gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
-          <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
-          <div className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
+          {['#FF5F57','#FEBC2E','#28C840'].map(c => (
+            <div key={c} className="w-2.5 h-2.5 rounded-full" style={{ background: c, opacity: 0.7 }} />
+          ))}
         </div>
-        <span className="text-[10px] font-mono text-white/25 ml-2">SOC Terminal — root@blueteam</span>
+        <span className="text-[9px] font-mono text-white/20 ml-2 flex-1">soc@blueteam:~</span>
+        <span className="text-[9px] font-mono text-green-400/50">● LIVE</span>
       </div>
-      {/* Lines */}
-      <div className="p-4 space-y-1.5 min-h-[180px]">
-        {TERMINAL_LINES.slice(0, shown).map((line, i) => (
-          <motion.div
-            key={i}
-            className="text-[11px] font-mono"
-            style={{ color: line.color }}
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            {line.text}
-            {i === shown - 1 && (
-              <span className="inline-block w-1.5 h-3 bg-cyan-400 ml-0.5 animate-[blink_0.8s_ease-in-out_infinite] align-middle" />
+      <div className="p-4 space-y-1.5" style={{ minHeight: 190 }}>
+        {TERM.slice(0, shown).map((line, i) => (
+          <motion.div key={i} className="text-[10px] font-mono leading-relaxed" style={{ color: line.c }}
+            initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.25 }}>
+            {line.t}{i === shown - 1 && (
+              <span className="inline-block w-1.5 h-3 ml-0.5 align-middle animate-[blink_0.8s_ease-in-out_infinite]"
+                style={{ background: line.c }} />
             )}
           </motion.div>
         ))}
@@ -129,184 +170,174 @@ function TerminalWidget() {
   )
 }
 
-// ── MITRE heatmap mini ────────────────────────────────────────
-const TACTICS = ['Recon','Initial Access','Execution','Persistence','Priv Esc','Defense Evasion','Cred Access','Discovery','Lateral Move','Collection','Exfiltration','Impact']
-function MitreWidget() {
-  return (
-    <div className="rounded-2xl border border-white/8 overflow-hidden"
-      style={{ background: 'rgba(2,8,20,0.9)', backdropFilter: 'blur(20px)' }}>
-      <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
-        <span className="text-[10px] font-mono text-cyan-400/70 uppercase tracking-wider">MITRE ATT&CK Coverage</span>
-        <span className="text-[10px] font-bold text-cyan-400">94%</span>
-      </div>
-      <div className="p-3 grid grid-cols-4 gap-1">
-        {TACTICS.map((tac, i) => {
-          const coverage = [95,88,72,90,85,78,92,88,75,80,70,95][i]
-          return (
-            <div key={tac} className="group relative">
-              <div
-                className="h-6 rounded-sm transition-all duration-300 group-hover:opacity-100"
-                style={{
-                  background: `rgba(0,245,255,${coverage / 200})`,
-                  border: `1px solid rgba(0,245,255,${coverage / 400})`,
-                  opacity: 0.7,
-                }}
-              />
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 rounded text-[9px] font-mono text-white bg-black/80 border border-cyan-500/20 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none">
-                {tac}: {coverage}%
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-// ── Glowing orb background ────────────────────────────────────
-function BackgroundOrbs() {
-  return (
-    <>
-      <div className="absolute top-1/4 left-1/3 w-[600px] h-[600px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(0,80,255,0.08) 0%, transparent 70%)', filter: 'blur(40px)' }} />
-      <div className="absolute top-1/2 right-1/4 w-[400px] h-[400px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(0,245,255,0.06) 0%, transparent 70%)', filter: 'blur(40px)' }} />
-      <div className="absolute bottom-0 left-1/2 w-[800px] h-[200px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse, rgba(0,60,180,0.12) 0%, transparent 70%)', filter: 'blur(60px)' }} />
-    </>
-  )
-}
-
-// ── Cyber grid ────────────────────────────────────────────────
-function CyberGrid() {
-  return (
-    <div className="absolute inset-0 pointer-events-none" style={{
-      backgroundImage: `
-        linear-gradient(rgba(0,245,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,245,255,0.025) 1px, transparent 1px)
-      `,
-      backgroundSize: '80px 80px',
-    }} />
-  )
-}
-
-// ── Main hero ─────────────────────────────────────────────────
+// ── Main Hero ─────────────────────────────────────────────────
 export default function Hero() {
-  const primaryMag   = useMagnetic(0.22)
-  const secondaryMag = useMagnetic(0.18)
+  const mouseRef   = useRef({ x: 0, y: 0 })
+  const primaryMag = useMagnetic(0.2)
+  const secMag     = useMagnetic(0.15)
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#020810]">
-      <BackgroundOrbs />
-      <CyberGrid />
+    <section className="relative w-full overflow-hidden" style={{ height: '100vh', minHeight: 700, background: '#010409' }}>
 
-      {/* Vignette */}
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, transparent 0%, rgba(2,8,16,0.4) 100%)' }} />
-
-      {/* ── Navbar spacer + top bar ── */}
-      <div className="relative z-20 pt-[72px]">
-        {/* Threat ticker bar */}
-        <div className="border-y border-cyan-500/8 bg-black/20 backdrop-blur-sm py-2 px-6 flex items-center gap-6 overflow-hidden">
-          <span className="text-[9px] font-mono text-cyan-400/50 uppercase tracking-widest shrink-0">LIVE FEED</span>
-          <div className="flex gap-6 overflow-hidden">
-            {THREATS.slice(0, 6).map((t, i) => (
-              <motion.span
-                key={i}
-                className="text-[10px] font-mono shrink-0 flex items-center gap-1.5"
-                animate={{ opacity: [0.4, 0.8, 0.4] }}
-                transition={{ duration: 3, delay: i * 0.5, repeat: Infinity }}
-              >
-                <span className="w-1 h-1 rounded-full" style={{ background: t.color }} />
-                <span style={{ color: t.color + '99' }}>{t.level}</span>
-                <span className="text-white/30">{t.msg}</span>
-              </motion.span>
-            ))}
+      {/* ── FULL-SCREEN 3D canvas (fills entire section) ── */}
+      <div className="absolute inset-0 z-0">
+        <Suspense fallback={
+          <div className="w-full h-full flex items-center justify-center">
+            <motion.div className="text-[11px] font-mono text-cyan-400/30 uppercase tracking-[0.3em]"
+              animate={{ opacity: [0.3, 0.8, 0.3] }} transition={{ duration: 1.5, repeat: Infinity }}>
+              INITIALIZING DEFENSE CORE...
+            </motion.div>
           </div>
-        </div>
+        }>
+          <HeroScene mouseRef={mouseRef} />
+        </Suspense>
       </div>
 
-      {/* ── Main layout ── */}
-      <div className="relative z-10 max-w-[1400px] mx-auto px-6 xl:px-10">
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_1fr] gap-0 min-h-[calc(100vh-120px)] items-center py-16">
+      {/* ── Dark vignette overlay for readability ── */}
+      <div className="absolute inset-0 z-1 pointer-events-none" style={{
+        background: `
+          radial-gradient(ellipse 60% 60% at 50% 50%, transparent 20%, rgba(1,4,9,0.55) 100%),
+          linear-gradient(to right, rgba(1,4,9,0.75) 0%, rgba(1,4,9,0.1) 45%, rgba(1,4,9,0.1) 55%, rgba(1,4,9,0.6) 100%),
+          linear-gradient(to bottom, rgba(1,4,9,0.7) 0%, transparent 15%, transparent 80%, rgba(1,4,9,0.9) 100%)
+        `,
+      }} />
 
-          {/* ── LEFT COLUMN ── */}
-          <div className="flex flex-col justify-center">
+      {/* ── HUD frame overlay ── */}
+      <div className="absolute inset-4 z-10 pointer-events-none rounded-2xl">
+        <Corner pos="tl" />
+        <Corner pos="tr" />
+        <Corner pos="bl" />
+        <Corner pos="br" />
+        {/* Top labels */}
+        <div className="absolute top-4 left-6 text-[9px] font-mono text-cyan-400/25 uppercase tracking-[0.25em]">
+          BLUETEAM_OS // DEFENSE_CORE_v3.1
+        </div>
+        <div className="absolute top-4 right-6 flex items-center gap-2">
+          <motion.span className="w-1.5 h-1.5 rounded-full bg-green-400"
+            animate={{ opacity: [1,0.3,1] }} transition={{ duration: 1.2, repeat: Infinity }} />
+          <span className="text-[9px] font-mono text-green-400/50 uppercase tracking-widest">SYSTEMS NOMINAL</span>
+        </div>
+        {/* Bottom labels */}
+        <div className="absolute bottom-4 left-6 text-[9px] font-mono text-cyan-400/20">
+          SHIELDS: ACTIVE // THREAT_LVL: ELEVATED // IR_TEAM: STANDBY
+        </div>
+        <div className="absolute bottom-4 right-6 text-[9px] font-mono text-cyan-400/20">
+          LAT: 36.7°N // LON: 3.0°E // NODE: DZ-SOC-01
+        </div>
+        {/* Scan line */}
+        <motion.div className="absolute left-0 right-0 h-[1px] pointer-events-none"
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(0,245,255,0.12), transparent)' }}
+          animate={{ top: ['4%', '94%'] }}
+          transition={{ duration: 6, repeat: Infinity, ease: 'linear' }} />
+      </div>
 
-            {/* Status row */}
-            <motion.div className="flex items-center gap-3 mb-10 flex-wrap"
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-green-400/20 bg-green-400/5">
-                <motion.span className="w-2 h-2 rounded-full bg-green-400"
-                  animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.5, repeat: Infinity }} />
-                <span className="text-[10px] font-mono text-green-400/80 uppercase tracking-wider">SOC ONLINE</span>
-              </div>
-              <ThreatFeed />
+      {/* ── Top alert bar ── */}
+      <motion.div
+        className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8 py-3 border-b border-cyan-500/8"
+        style={{ background: 'rgba(1,4,9,0.7)', backdropFilter: 'blur(20px)', paddingTop: 76 }}
+        initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.6 }}>
+        <AlertTicker />
+        <div className="hidden md:flex items-center gap-4">
+          <div className="text-[9px] font-mono text-white/20">247 alerts today</div>
+          <div className="w-px h-4 bg-white/10" />
+          <div className="text-[9px] font-mono text-green-400/50">94% MITRE coverage</div>
+        </div>
+      </motion.div>
+
+      {/* ── Floating metric cards ── */}
+      <MetricCard icon="🚨" label="Active Alerts"   value="3 Critical"  sub="Needs triage"   color="#FF4444" delay={2.0} x="2%"  y="22%" />
+      <MetricCard icon="🛡️" label="Shield Status"   value="ACTIVE"      sub="All systems UP"  color="#00F5FF" delay={2.2} x="2%"  y="52%" />
+      <MetricCard icon="⚡" label="Alerts Triaged"  value="244 / 247"   sub="Today's queue"   color="#FFD700" delay={2.4} x="76%" y="18%" />
+      <MetricCard icon="🎯" label="MITRE Coverage"  value="94.2%"       sub="ATT&CK mapped"   color="#A78BFA" delay={2.6} x="76%" y="46%" />
+      <MetricCard icon="🔍" label="Threat Hunts"    value="12 Active"   sub="Hypotheses open" color="#00FF88" delay={2.8} x="76%" y="68%" />
+
+      {/* ── LEFT — Main text content ── */}
+      <div className="absolute inset-0 z-20 flex items-center pointer-events-none"
+        style={{ paddingTop: 120 }}>
+        <div className="max-w-7xl mx-auto px-8 w-full pointer-events-auto" style={{ paddingLeft: '5%' }}>
+          <div className="max-w-[560px]">
+
+            {/* Badge */}
+            <motion.div className="inline-flex items-center gap-2 mb-8 px-3 py-1.5 rounded-lg border border-cyan-500/20"
+              style={{ background: 'rgba(0,245,255,0.05)', backdropFilter: 'blur(12px)' }}
+              initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+              <span className="text-[10px] font-mono text-cyan-400/70 uppercase tracking-[0.2em]">
+                Blue Team Cybersecurity Roadmap 2025
+              </span>
             </motion.div>
 
-            {/* Main headline */}
-            <div className="space-y-0 mb-6">
-              {['Defend.', 'Detect.', 'Dominate.'].map((word, i) => (
-                <div key={word} className="overflow-hidden">
-                  <motion.h1
-                    className="font-black leading-[0.88] tracking-[-0.03em]"
+            {/* Headline — 3 lines staggered */}
+            {['Defend.', 'Detect.', 'Dominate.'].map((word, i) => (
+              <div key={word} className="overflow-hidden">
+                <motion.div
+                  initial={{ y: '115%' }}
+                  animate={{ y: 0 }}
+                  transition={{ delay: 0.6 + i * 0.14, duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <h1 className="font-black leading-[0.87] tracking-[-0.04em]"
                     style={{
-                      fontSize: 'clamp(64px, 8vw, 110px)',
-                      color: i === 2 ? 'transparent' : '#FFFFFF',
-                      background: i === 2 ? 'linear-gradient(135deg, #00F5FF 0%, #0088FF 50%, #00F5FF 100%)' : undefined,
+                      fontSize: 'clamp(60px, 8.5vw, 118px)',
+                      color: i < 2 ? '#FFFFFF' : 'transparent',
+                      background: i === 2
+                        ? 'linear-gradient(135deg, #00F5FF 0%, #0066FF 40%, #00AAFF 70%, #00F5FF 100%)'
+                        : undefined,
                       WebkitBackgroundClip: i === 2 ? 'text' : undefined,
-                      backgroundClip: i === 2 ? 'text' : undefined,
                       WebkitTextFillColor: i === 2 ? 'transparent' : undefined,
-                      backgroundSize: i === 2 ? '200% auto' : undefined,
-                    }}
-                    initial={{ y: '110%' }}
-                    animate={i === 2
-                      ? { y: 0, backgroundPosition: ['0% center', '200% center', '0% center'] }
-                      : { y: 0 }
-                    }
-                    transition={{
-                      y: { duration: 0.9, delay: 0.2 + i * 0.12, ease: [0.16, 1, 0.3, 1] },
-                      backgroundPosition: i === 2 ? { duration: 4, repeat: Infinity, ease: 'linear', delay: 1.5 } : {},
-                    }}
-                  >
+                      backgroundClip: i === 2 ? 'text' : undefined,
+                      textShadow: i < 2 ? '0 0 80px rgba(255,255,255,0.08)' : undefined,
+                    }}>
                     {word}
-                  </motion.h1>
-                </div>
-              ))}
-            </div>
+                  </h1>
+                </motion.div>
+              </div>
+            ))}
 
-            {/* Typed subtitle */}
-            <motion.div
-              className="text-xl md:text-2xl font-medium text-white/50 mb-6 h-10 flex items-center"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
-            >
+            {/* Typed role */}
+            <motion.div className="text-xl md:text-2xl font-semibold mt-6 mb-5 h-9 flex items-center"
+              style={{ color: 'rgba(255,255,255,0.45)' }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>
               Become a&nbsp;<TypedRole />
             </motion.div>
 
             {/* Description */}
-            <motion.p
-              className="text-base text-blue-300/40 leading-relaxed mb-10 max-w-[500px]"
-              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0 }}
-            >
-              From zero to SOC Professional. 7 structured phases, 50+ topics, real-world tools, certifications, and hands-on labs — the most complete Blue Team roadmap ever built.
+            <motion.p className="text-sm leading-relaxed mb-10 max-w-[440px]"
+              style={{ color: 'rgba(148,185,255,0.45)' }}
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.3 }}>
+              The most complete Blue Team roadmap ever built — 7 phases, 50+ topics, real-world tools, certifications and labs. Zero to SOC Professional.
             </motion.p>
 
-            {/* CTA buttons */}
-            <motion.div className="flex flex-wrap gap-3 mb-14"
-              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }}>
+            {/* CTAs */}
+            <motion.div className="flex flex-wrap gap-3 mb-12"
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }}>
               <div {...primaryMag}>
                 <button
-                  className="group relative px-8 py-4 rounded-2xl font-bold text-sm text-white overflow-hidden"
-                  style={{ background: 'linear-gradient(135deg, #0055FF, #00AAFF)', boxShadow: '0 0 40px rgba(0,120,255,0.4), inset 0 1px 0 rgba(255,255,255,0.15)' }}
+                  className="group relative overflow-hidden px-8 py-4 rounded-2xl text-sm font-bold text-white"
+                  style={{
+                    background: 'linear-gradient(135deg, #0044EE 0%, #0099FF 100%)',
+                    boxShadow: '0 0 40px rgba(0,120,255,0.45), inset 0 1px 0 rgba(255,255,255,0.15)',
+                  }}
                   onClick={() => document.querySelector('#roadmap')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                  <span className="relative flex items-center gap-2">⚡ Start the Roadmap <span className="group-hover:translate-x-1 transition-transform">→</span></span>
+                  <span className="relative flex items-center gap-2.5">
+                    <span>⚡</span>
+                    Start the Roadmap
+                    <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
+                  </span>
                 </button>
               </div>
-              <div {...secondaryMag}>
+              <div {...secMag}>
                 <button
-                  className="px-8 py-4 rounded-2xl font-semibold text-sm text-cyan-400 border border-cyan-500/20 bg-cyan-500/5 hover:bg-cyan-500/10 hover:border-cyan-400/40 transition-all"
+                  className="px-8 py-4 rounded-2xl text-sm font-semibold transition-all duration-200"
+                  style={{
+                    background: 'rgba(0,245,255,0.05)',
+                    border: '1px solid rgba(0,245,255,0.18)',
+                    color: '#00F5FF',
+                    backdropFilter: 'blur(12px)',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,245,255,0.1)'; e.currentTarget.style.borderColor = 'rgba(0,245,255,0.4)' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,245,255,0.05)'; e.currentTarget.style.borderColor = 'rgba(0,245,255,0.18)' }}
                   onClick={() => document.querySelector('#labs')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   Explore Labs
@@ -314,127 +345,45 @@ export default function Hero() {
               </div>
             </motion.div>
 
-            {/* Stats row */}
-            <motion.div className="grid grid-cols-4 gap-3"
-              initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.3 }}>
+            {/* Stats */}
+            <motion.div className="flex gap-3 flex-wrap"
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.6 }}>
               {[
-                { val: '7',     sub: 'Phases'     },
-                { val: '50+',   sub: 'Topics'     },
-                { val: '10+',   sub: 'Certs'      },
-                { val: '$120K', sub: 'Avg Salary' },
-              ].map((s, i) => (
-                <motion.div key={s.val}
-                  className="relative px-4 py-3 rounded-2xl border border-white/6 bg-white/[0.02] group hover:border-cyan-400/20 transition-all overflow-hidden"
-                  whileHover={{ y: -3 }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative">
-                    <div className="text-2xl font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">{s.val}</div>
-                    <div className="text-[10px] text-white/30 uppercase tracking-wider mt-0.5">{s.sub}</div>
-                  </div>
-                </motion.div>
-              ))}
+                { val: '7',     label: 'Phases',    color: '#00F5FF' },
+                { val: '50+',   label: 'Topics',    color: '#0099FF' },
+                { val: '10+',   label: 'Certs',     color: '#A78BFA' },
+                { val: '$120K', label: 'Avg Salary', color: '#00FF88' },
+              ].map(s => <StatPill key={s.val} {...s} />)}
             </motion.div>
-          </div>
-
-          {/* ── RIGHT COLUMN — 3D + widgets ── */}
-          <div className="relative h-[600px] xl:h-[800px] flex items-center justify-center">
-
-            {/* 3D scene fills background */}
-            <div className="absolute inset-0 z-0">
-              <Suspense fallback={
-                <div className="w-full h-full flex items-center justify-center">
-                  <motion.div className="text-cyan-400/30 text-xs font-mono"
-                    animate={{ opacity: [0.3, 0.7, 0.3] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                    INITIALIZING CORE...
-                  </motion.div>
-                </div>
-              }>
-                <HeroScene />
-              </Suspense>
-            </div>
-
-            {/* ── Terminal widget — bottom left ── */}
-            <motion.div
-              className="absolute bottom-4 left-0 w-72 z-20"
-              initial={{ opacity: 0, x: -30, y: 20 }}
-              animate={{ opacity: 1, x: 0, y: 0 }}
-              transition={{ delay: 1.8, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <TerminalWidget />
-            </motion.div>
-
-            {/* ── MITRE widget — top right ── */}
-            <motion.div
-              className="absolute top-8 right-0 w-64 z-20"
-              initial={{ opacity: 0, x: 30, y: -20 }}
-              animate={{ opacity: 1, x: 0, y: 0 }}
-              transition={{ delay: 2.0, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <MitreWidget />
-            </motion.div>
-
-            {/* ── Alert count badge — top left ── */}
-            <motion.div
-              className="absolute top-8 left-4 z-20 flex items-center gap-3 px-4 py-3 rounded-2xl border border-white/8"
-              style={{ background: 'rgba(2,8,20,0.9)', backdropFilter: 'blur(20px)' }}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 2.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="relative">
-                <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-lg">🚨</div>
-                <motion.span
-                  className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-red-500 border border-[#020810] text-[8px] text-white flex items-center justify-center font-bold"
-                  animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 2, repeat: Infinity }}
-                >3</motion.span>
-              </div>
-              <div>
-                <div className="text-xs font-bold text-white">Active Alerts</div>
-                <div className="text-[10px] text-white/40">Needs triage</div>
-              </div>
-            </motion.div>
-
-            {/* ── Shield status badge — bottom right ── */}
-            <motion.div
-              className="absolute bottom-4 right-0 z-20 flex items-center gap-3 px-4 py-3 rounded-2xl border border-cyan-500/15"
-              style={{ background: 'rgba(2,8,20,0.9)', backdropFilter: 'blur(20px)' }}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 2.4, duration: 0.6 }}
-            >
-              <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-lg">🛡️</div>
-              <div>
-                <div className="text-[10px] text-cyan-400/60 uppercase tracking-wider">Defense Status</div>
-                <div className="text-sm font-bold text-cyan-400 flex items-center gap-1.5">
-                  <motion.span className="w-1.5 h-1.5 rounded-full bg-cyan-400"
-                    animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.2, repeat: Infinity }} />
-                  SHIELDS ACTIVE
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Center glow under 3D */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-80 h-32 pointer-events-none"
-              style={{ background: 'radial-gradient(ellipse, rgba(0,200,255,0.1) 0%, transparent 70%)' }} />
           </div>
         </div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* ── BOTTOM RIGHT — Mini terminal ── */}
       <motion.div
-        className="relative z-20 flex flex-col items-center pb-10 gap-2 cursor-pointer"
-        animate={{ y: [0, 6, 0] }}
-        transition={{ repeat: Infinity, duration: 2.5 }}
-        onClick={() => document.querySelector('#what')?.scrollIntoView({ behavior: 'smooth' })}
+        className="absolute bottom-16 right-6 z-20 w-72 hidden xl:block"
+        initial={{ opacity: 0, x: 30, y: 20 }}
+        animate={{ opacity: 1, x: 0, y: 0 }}
+        transition={{ delay: 2.5, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
       >
-        <span className="text-[9px] font-mono text-cyan-400/25 uppercase tracking-[0.3em]">scroll to explore</span>
-        <div className="w-px h-10 bg-gradient-to-b from-cyan-400/30 to-transparent" />
+        <MiniTerminal />
       </motion.div>
 
-      {/* Bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none"
-        style={{ background: 'linear-gradient(to top, #050D1A, transparent)' }} />
+      {/* ── Scroll indicator ── */}
+      <motion.div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 cursor-pointer"
+        animate={{ y: [0, 7, 0] }}
+        transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
+        onClick={() => document.querySelector('#what')?.scrollIntoView({ behavior: 'smooth' })}
+      >
+        <span className="text-[8px] font-mono text-white/15 uppercase tracking-[0.4em]">explore</span>
+        <div className="w-px h-10 bg-gradient-to-b from-cyan-400/25 to-transparent" />
+        <div className="w-4 h-4 rounded-full border border-cyan-400/20 flex items-center justify-center">
+          <motion.div className="w-1 h-1 rounded-full bg-cyan-400/60"
+            animate={{ y: [0, 3, 0], opacity: [1, 0.3, 1] }}
+            transition={{ repeat: Infinity, duration: 1.5 }} />
+        </div>
+      </motion.div>
     </section>
   )
 }
