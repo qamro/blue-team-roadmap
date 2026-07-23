@@ -371,7 +371,7 @@ export default function Hero() {
 
       {/* ── Scroll indicator ── */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 cursor-pointer"
+        className="absolute bottom-8 left-[49%] -translate-x-1/2 z-20 flex flex-col items-center gap-2 cursor-pointer"
         animate={{ y: [0, 7, 0] }}
         transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
         onClick={() => document.querySelector('#what')?.scrollIntoView({ behavior: 'smooth' })}
