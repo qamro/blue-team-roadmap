@@ -247,7 +247,7 @@ export default function Hero() {
       {/* ── Floating metric cards ── */}
       <MetricCard icon="🚨" label="Active Alerts"   value="3 Critical"  sub="Needs triage"   color="#FF4444" delay={2.0} x="2%"  y="24%" />
       <MetricCard icon="🛡️" label="Shield Status"   value="ACTIVE"      sub="All systems UP"  color="#00F5FF" delay={2.2} x="2%"  y="50%" />
-      <MetricCard icon="⚡" label="Alerts Triaged"  value="244 / 247"   sub="Today's queue"   color="#FFD700" delay={2.4} x="2%" y="76%" />
+      <MetricCard icon="⚡" label="Alerts Triaged"  value="244 / 247"   sub="Today's queue"   color="#FFD700" delay={2.4} x="2%" y="74%" />
       <MetricCard icon="🎯" label="MITRE Coverage"  value="94.2%"       sub="ATT&CK mapped"   color="#A78BFA" delay={2.6} x="77%" y="22%" />
       <MetricCard icon="🔍" label="Threat Hunts"    value="12 Active"   sub="Hypotheses open" color="#00FF88" delay={2.8} x="77%" y="48%" />
 
