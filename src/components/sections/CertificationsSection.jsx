@@ -16,12 +16,17 @@ function CertCard({ cert, index }) {
   const lc = LEVEL_COLORS[cert.level] || LEVEL_COLORS.Entry
 
   return (
-    <motion.div
-      className="relative rounded-2xl p-5 border cursor-pointer group transition-all duration-300"
+    <motion.a
+      href={cert.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="relative rounded-2xl p-5 border group transition-all duration-300 block"
       style={{
-        background:   hovered ? lc.bg : 'rgba(10,20,45,0.5)',
-        borderColor:  hovered ? lc.border : 'rgba(0,245,255,0.08)',
-        boxShadow:    hovered ? `0 0 30px ${lc.border}` : 'none',
+        background:  hovered ? lc.bg : 'rgba(10,20,45,0.5)',
+        borderColor: hovered ? lc.border : 'rgba(0,245,255,0.08)',
+        boxShadow:   hovered ? `0 0 30px ${lc.border}` : 'none',
+        textDecoration: 'none',
+        cursor: 'pointer',
       }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -51,7 +56,7 @@ function CertCard({ cert, index }) {
       <div className="flex items-center justify-between pt-3 border-t border-white/5">
         <span className="text-[10px] text-blue-400/40 font-mono">⏱ {cert.time}</span>
         <motion.span
-          className="text-[10px] font-semibold"
+          className="text-[10px] font-semibold flex items-center gap-1"
           style={{ color: lc.text }}
           animate={{ opacity: hovered ? 1 : 0 }}
         >
@@ -63,7 +68,7 @@ function CertCard({ cert, index }) {
       <AnimatePresence>
         {hovered && (
           <motion.div
-            className="absolute top-0 right-0 w-20 h-20 rounded-tr-2xl"
+            className="absolute top-0 right-0 w-20 h-20 rounded-tr-2xl pointer-events-none"
             style={{ background: `radial-gradient(circle at top right, ${lc.border}, transparent 70%)` }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -71,7 +76,7 @@ function CertCard({ cert, index }) {
           />
         )}
       </AnimatePresence>
-    </motion.div>
+    </motion.a>
   )
 }
 
@@ -83,7 +88,6 @@ export default function CertificationsSection() {
 
   return (
     <section id="certs" className="relative py-32 overflow-hidden">
-      {/* BG */}
       <div className="absolute inset-0 cyber-grid-bg opacity-20" />
       <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-blue-700/5 blur-[100px]" />
 
@@ -107,7 +111,7 @@ export default function CertificationsSection() {
             <span className="gradient-text">Expertise</span>
           </h2>
           <p className="text-lg text-blue-300/60 max-w-2xl mx-auto">
-            Industry-recognized certifications that prove your Blue Team skills to employers worldwide.
+            Industry-recognized certifications that prove your Blue Team skills to employers worldwide. Click any card to visit the official certification page.
           </p>
         </motion.div>
 
