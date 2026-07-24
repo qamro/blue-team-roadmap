@@ -50,7 +50,7 @@ function AlertTicker() {
   const a = ALERTS[idx]
   return (
     <div className="flex items-center gap-3">
-      <span className="text-[9px] font-mono font-bold tracking-widest text-white/30 uppercase shrink-0">LIVE SOC</span>
+      <span className="text-[9px] font-mono font-bold tracking-widest text-white/30 uppercase shrink-0 hidden sm:block">LIVE SOC</span>
       <div className="w-px h-3 bg-white/10 shrink-0" />
       <AnimatePresence mode="wait">
         <motion.div key={idx} className="flex items-center gap-2"
