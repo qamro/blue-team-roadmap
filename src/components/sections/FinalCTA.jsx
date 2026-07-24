@@ -134,7 +134,7 @@ export default function FinalCTA() {
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.4 }}
             >
-              Every breach stopped, every alert triaged, every incident resolved — it starts with one decision.
+              Every breach stopped, every alert triaged, every incident resolved. It starts with one decision.
               <strong className="text-blue-200"> Start your Blue Team journey today.</strong>
             </motion.p>
 
