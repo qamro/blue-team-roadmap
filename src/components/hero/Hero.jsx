@@ -304,7 +304,7 @@ export default function Hero() {
             <motion.p className="text-sm leading-relaxed mb-10 max-w-[440px]"
               style={{ color: 'rgba(148,185,255,0.45)' }}
               initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.3 }}>
-              The most complete Blue Team roadmap ever built — 7 phases, 50+ topics, real-world tools, certifications and labs. Zero to SOC Professional.
+              The most complete Blue Team roadmap ever built: 7 phases, 50+ topics, real-world tools, certifications and labs. Zero to SOC Professional.
             </motion.p>
 
             {/* CTAs */}
