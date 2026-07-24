@@ -118,7 +118,9 @@ src/
 
 ## 📄 License
 
-MIT — Free to use, share, and build upon.
+**MIT**
+
+Free to use, share, and build upon.
 
 ---
 
