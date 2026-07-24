@@ -9,7 +9,7 @@ export const BLUE_TEAM_CARDS = [
   {
     icon: '🔍',
     title: 'SOC Operations',
-    desc: 'Security Operations Centers are the nerve centers of cyber defense — monitoring systems 24/7 and triaging security alerts.',
+    desc: 'Security Operations Centers are the nerve centers of cyber defense, monitoring systems 24/7 and triaging security alerts.',
     color: 'from-cyan-600 to-blue-400',
   },
   {
