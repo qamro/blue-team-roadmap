@@ -76,7 +76,7 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-sm text-blue-300/40 leading-relaxed mb-6">
-              The most comprehensive Blue Team cybersecurity roadmap. From foundations to professional — structured, visual, and actionable.
+              The most comprehensive Blue Team cybersecurity roadmap. From foundations to professional • structured, visual, and actionable.
             </p>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
