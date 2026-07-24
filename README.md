@@ -12,7 +12,7 @@
 
 ## 🌐 Live Demo
 
-**[blueteam-roadmap.vercel.app](https://blueteam-roadmap.vercel.app)**
+**[blueteam-roadmap.vercel.app](blue-team-roadmap.vercel.app)**
 
 ---
 
