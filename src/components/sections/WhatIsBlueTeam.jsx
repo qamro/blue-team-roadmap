@@ -67,7 +67,7 @@ export default function WhatIsBlueTeam() {
           </h2>
 
           <p className="text-lg text-blue-300/60 max-w-2xl mx-auto leading-relaxed">
-            Blue Teams are the guardians of the digital world — the cybersecurity professionals who stand between your data and the adversaries who want it.
+            Blue Teams are the guardians of the digital world, the cybersecurity professionals who stand between your data and the adversaries who want it.
           </p>
         </motion.div>
 
