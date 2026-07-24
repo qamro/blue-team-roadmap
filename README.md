@@ -54,8 +54,8 @@ A cinematic, interactive web experience featuring:
 
 ```bash
 # Clone the repo
-git clone https://github.com/qamro/blueteam-roadmap.git
-cd blueteam-roadmap
+git clone https://github.com/qamro/blue-team-roadmap
+cd blue-team-roadmap
 
 # Install dependencies
 npm install
