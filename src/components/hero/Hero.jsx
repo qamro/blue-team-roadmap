@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, Suspense, lazy } from 'react'
-import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useMagnetic } from '../../hooks/useMagnetic'
 
 const HeroScene = lazy(() => import('../3d/HeroScene'))
@@ -49,34 +49,23 @@ function AlertTicker() {
   }, [])
   const a = ALERTS[idx]
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-[9px] font-mono font-bold tracking-widest text-white/30 uppercase shrink-0">LIVE SOC</span>
-      <div className="w-px h-3 bg-white/10 shrink-0" />
+    <div className="flex items-center gap-2 min-w-0">
+      <span className="text-[9px] font-mono font-bold tracking-widest text-white/30 uppercase shrink-0 hidden sm:block">LIVE SOC</span>
+      <div className="w-px h-3 bg-white/10 shrink-0 hidden sm:block" />
       <AnimatePresence mode="wait">
-        <motion.div key={idx} className="flex items-center gap-2"
+        <motion.div key={idx} className="flex items-center gap-2 min-w-0"
           initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
           transition={{ duration: 0.25 }}>
           <span className="w-1.5 h-1.5 rounded-full shrink-0 animate-pulse" style={{ background: a.col, boxShadow: `0 0 6px ${a.col}` }} />
-          <span className="text-[10px] font-mono font-bold shrink-0" style={{ color: a.col }}>{a.sev}</span>
-          <span className="text-[10px] font-mono text-white/40 truncate max-w-[260px]">{a.msg}</span>
+          <span className="text-[9px] font-mono font-bold shrink-0" style={{ color: a.col }}>{a.sev}</span>
+          <span className="text-[9px] font-mono text-white/40 truncate">{a.msg}</span>
         </motion.div>
       </AnimatePresence>
     </div>
   )
 }
 
-// ── Stat counter ──────────────────────────────────────────────
-function StatPill({ val, label, color = '#00F5FF' }) {
-  return (
-    <div className="flex flex-col items-center px-5 py-3 rounded-xl border border-white/6"
-      style={{ background: 'rgba(0,10,30,0.6)', backdropFilter: 'blur(20px)' }}>
-      <span className="text-xl font-black" style={{ color }}>{val}</span>
-      <span className="text-[9px] font-mono text-white/30 uppercase tracking-wider mt-0.5">{label}</span>
-    </div>
-  )
-}
-
-// ── HUD corner decoration ─────────────────────────────────────
+// ── HUD corner ────────────────────────────────────────────────
 function Corner({ pos }) {
   const cls = {
     tl: 'top-0 left-0 border-t-2 border-l-2 rounded-tl-xl',
@@ -84,14 +73,14 @@ function Corner({ pos }) {
     bl: 'bottom-0 left-0 border-b-2 border-l-2 rounded-bl-xl',
     br: 'bottom-0 right-0 border-b-2 border-r-2 rounded-br-xl',
   }[pos]
-  return <div className={`absolute w-6 h-6 ${cls} border-cyan-400/30`} />
+  return <div className={`absolute w-5 h-5 md:w-6 md:h-6 ${cls} border-cyan-400/25`} />
 }
 
-// ── Floating metric card ──────────────────────────────────────
+// ── Floating metric card — desktop only ───────────────────────
 function MetricCard({ icon, label, value, sub, color, delay, x, y }) {
   return (
     <motion.div
-      className="absolute hidden lg:block"
+      className="absolute hidden xl:block"
       style={{ left: x, top: y }}
       initial={{ opacity: 0, scale: 0.7, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -123,7 +112,7 @@ function MetricCard({ icon, label, value, sub, color, delay, x, y }) {
   )
 }
 
-// ── Terminal lines ────────────────────────────────────────────
+// ── Terminal — desktop only ───────────────────────────────────
 const TERM = [
   { d: 0.8,  c: '#00F5FF', t: '$ siem-connect --host splunk-prod' },
   { d: 1.5,  c: '#00FF88', t: '✓ Connected — 2,847 endpoints online' },
@@ -145,7 +134,6 @@ function MiniTerminal() {
   return (
     <div className="rounded-2xl overflow-hidden border border-white/8"
       style={{ background: 'rgba(1,4,14,0.95)', backdropFilter: 'blur(24px)' }}>
-      {/* Title bar */}
       <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5">
         <div className="flex gap-1.5">
           {['#FF5F57','#FEBC2E','#28C840'].map(c => (
@@ -170,6 +158,27 @@ function MiniTerminal() {
   )
 }
 
+// ── Mobile stats row ──────────────────────────────────────────
+function MobileStats() {
+  return (
+    <div className="grid grid-cols-4 gap-2 mt-8">
+      {[
+        { val: '7',     label: 'Phases',    color: '#00F5FF' },
+        { val: '50+',   label: 'Topics',    color: '#0099FF' },
+        { val: '10+',   label: 'Certs',     color: '#A78BFA' },
+        { val: '$120K', label: 'Salary',    color: '#00FF88' },
+      ].map(s => (
+        <div key={s.val}
+          className="flex flex-col items-center px-2 py-3 rounded-xl border border-white/6"
+          style={{ background: 'rgba(0,10,30,0.6)', backdropFilter: 'blur(20px)' }}>
+          <span className="text-base sm:text-lg font-black" style={{ color: s.color }}>{s.val}</span>
+          <span className="text-[8px] font-mono text-white/30 uppercase tracking-wide mt-0.5">{s.label}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ── Main Hero ─────────────────────────────────────────────────
 export default function Hero() {
   const mouseRef   = useRef({ x: 0, y: 0 })
@@ -177,9 +186,10 @@ export default function Hero() {
   const secMag     = useMagnetic(0.15)
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ height: '100vh', minHeight: 700, background: '#010409' }}>
+    <section className="relative w-full overflow-hidden"
+      style={{ minHeight: '100vh', background: '#010409' }}>
 
-      {/* ── FULL-SCREEN 3D canvas (fills entire section) ── */}
+      {/* ── FULL-SCREEN 3D canvas ── */}
       <div className="absolute inset-0 z-0">
         <Suspense fallback={
           <div className="w-full h-full flex items-center justify-center">
@@ -193,81 +203,78 @@ export default function Hero() {
         </Suspense>
       </div>
 
-      {/* ── Dark vignette overlay for readability ── */}
-      <div className="absolute inset-0 z-1 pointer-events-none" style={{
+      {/* ── Vignette ── */}
+      <div className="absolute inset-0 z-[1] pointer-events-none" style={{
         background: `
-          radial-gradient(ellipse 60% 60% at 50% 50%, transparent 20%, rgba(1,4,9,0.55) 100%),
-          linear-gradient(to right, rgba(1,4,9,0.75) 0%, rgba(1,4,9,0.1) 45%, rgba(1,4,9,0.1) 55%, rgba(1,4,9,0.6) 100%),
-          linear-gradient(to bottom, rgba(1,4,9,0.7) 0%, transparent 15%, transparent 80%, rgba(1,4,9,0.9) 100%)
+          radial-gradient(ellipse 70% 60% at 50% 50%, transparent 10%, rgba(1,4,9,0.6) 100%),
+          linear-gradient(to bottom, rgba(1,4,9,0.75) 0%, transparent 18%, transparent 78%, rgba(1,4,9,0.95) 100%)
         `,
       }} />
 
-      {/* ── HUD frame overlay ── */}
-      <div className="absolute inset-4 z-10 pointer-events-none rounded-2xl">
+      {/* ── HUD frame — hidden on small mobile ── */}
+      <div className="absolute inset-3 sm:inset-4 z-10 pointer-events-none rounded-xl sm:rounded-2xl hidden sm:block">
         <Corner pos="tl" />
         <Corner pos="tr" />
         <Corner pos="bl" />
         <Corner pos="br" />
-        {/* Top labels */}
-        <div className="absolute top-4 left-6 text-[9px] font-mono text-cyan-400/25 uppercase tracking-[0.25em]">
+        <div className="absolute top-4 left-5 text-[8px] font-mono text-cyan-400/20 uppercase tracking-[0.2em] hidden md:block">
           BLUETEAM_OS // DEFENSE_CORE_v3.1
         </div>
-        <div className="absolute top-4 right-6 flex items-center gap-2">
+        <div className="absolute top-4 right-5 items-center gap-2 hidden md:flex">
           <motion.span className="w-1.5 h-1.5 rounded-full bg-green-400"
             animate={{ opacity: [1,0.3,1] }} transition={{ duration: 1.2, repeat: Infinity }} />
-          <span className="text-[9px] font-mono text-green-400/50 uppercase tracking-widest">SYSTEMS NOMINAL</span>
+          <span className="text-[8px] font-mono text-green-400/40 uppercase tracking-widest">SYSTEMS NOMINAL</span>
         </div>
-        {/* Bottom labels */}
-        <div className="absolute bottom-4 left-6 text-[9px] font-mono text-cyan-400/20">
+        <div className="absolute bottom-4 left-5 text-[8px] font-mono text-cyan-400/15 hidden lg:block">
           SHIELDS: ACTIVE // THREAT_LVL: ELEVATED // IR_TEAM: STANDBY
         </div>
-        <div className="absolute bottom-4 right-6 text-[9px] font-mono text-cyan-400/20">
+        <div className="absolute bottom-4 right-5 text-[8px] font-mono text-cyan-400/15 hidden lg:block">
           LAT: 36.7°N // LON: 3.0°E // NODE: DZ-SOC-01
         </div>
         {/* Scan line */}
-        <motion.div className="absolute left-0 right-0 h-[1px] pointer-events-none"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(0,245,255,0.12), transparent)' }}
+        <motion.div className="absolute left-0 right-0 h-[1px] pointer-events-none hidden sm:block"
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(0,245,255,0.1), transparent)' }}
           animate={{ top: ['4%', '94%'] }}
           transition={{ duration: 6, repeat: Infinity, ease: 'linear' }} />
       </div>
 
       {/* ── Top alert bar ── */}
       <motion.div
-        className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8 py-3 border-b border-cyan-500/8"
-        style={{ background: 'rgba(1,4,9,0.7)', backdropFilter: 'blur(20px)', paddingTop: 76 }}
+        className="absolute left-0 right-0 z-20 flex items-center justify-between px-4 sm:px-8 py-2.5 border-b border-cyan-500/8"
+        style={{ background: 'rgba(1,4,9,0.7)', backdropFilter: 'blur(20px)', top: 64 }}
         initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.6 }}>
         <AlertTicker />
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden lg:flex items-center gap-4 shrink-0">
           <div className="text-[9px] font-mono text-white/20">247 alerts today</div>
           <div className="w-px h-4 bg-white/10" />
           <div className="text-[9px] font-mono text-green-400/50">94% MITRE coverage</div>
         </div>
       </motion.div>
 
-      {/* ── Floating metric cards ── */}
-      <MetricCard icon="🚨" label="Active Alerts"   value="3 Critical"  sub="Needs triage"   color="#FF4444" delay={2.0} x="2%"  y="24%" />
-      <MetricCard icon="🛡️" label="Shield Status"   value="ACTIVE"      sub="All systems UP"  color="#00F5FF" delay={2.2} x="2%"  y="49%" />
-      <MetricCard icon="⚡" label="Alerts Triaged"  value="244 / 247"   sub="Today's queue"   color="#FFD700" delay={2.4} x="2%" y="74%" />
-      <MetricCard icon="🎯" label="MITRE Coverage"  value="94.2%"       sub="ATT&CK mapped"   color="#A78BFA" delay={2.6} x="77%" y="22%" />
-      <MetricCard icon="🔍" label="Threat Hunts"    value="12 Active"   sub="Hypotheses open" color="#00FF88" delay={2.8} x="77%" y="48%" />
+      {/* ── Floating metric cards — xl only ── */}
+      <MetricCard icon="🚨" label="Active Alerts"  value="3 Critical"  sub="Needs triage"   color="#FF4444" delay={2.0} x="2%"  y="24%" />
+      <MetricCard icon="🛡️" label="Shield Status"  value="ACTIVE"      sub="All systems UP"  color="#00F5FF" delay={2.2} x="2%"  y="54%" />
+      <MetricCard icon="⚡" label="Alerts Triaged" value="244 / 247"   sub="Today's queue"   color="#FFD700" delay={2.4} x="74%" y="20%" />
+      <MetricCard icon="🎯" label="MITRE Coverage" value="94.2%"       sub="ATT&CK mapped"   color="#A78BFA" delay={2.6} x="74%" y="47%" />
+      <MetricCard icon="🔍" label="Threat Hunts"   value="12 Active"   sub="Hypotheses open" color="#00FF88" delay={2.8} x="74%" y="68%" />
 
-      {/* ── LEFT — Main text content ── */}
-      <div className="absolute inset-0 z-20 flex items-center pointer-events-none"
-        style={{ paddingTop: 120 }}>
-        <div className="max-w-7xl mx-auto px-8 w-full pointer-events-auto" style={{ paddingLeft: '5%' }}>
-          <div className="max-w-[560px]">
+      {/* ── Main content ── */}
+      <div className="relative z-20 flex items-center min-h-screen pt-[120px] pb-20 px-5 sm:px-8 xl:px-16">
+        <div className="w-full max-w-7xl mx-auto">
+          <div className="max-w-full xl:max-w-[580px]">
 
             {/* Badge */}
-            <motion.div className="inline-flex items-center gap-2 mb-8 px-3 py-1.5 rounded-lg border border-cyan-500/20"
+            <motion.div
+              className="inline-flex items-center gap-2 mb-6 sm:mb-8 px-3 py-1.5 rounded-lg border border-cyan-500/20"
               style={{ background: 'rgba(0,245,255,0.05)', backdropFilter: 'blur(12px)' }}
               initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}>
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-              <span className="text-[10px] font-mono text-cyan-400/70 uppercase tracking-[0.2em]">
+              <span className="text-[9px] sm:text-[10px] font-mono text-cyan-400/70 uppercase tracking-[0.15em] sm:tracking-[0.2em]">
                 Blue Team Cybersecurity Roadmap 2025
               </span>
             </motion.div>
 
-            {/* Headline — 3 lines staggered */}
+            {/* Headline */}
             {['Defend.', 'Detect.', 'Dominate.'].map((word, i) => (
               <div key={word} className="overflow-hidden">
                 <motion.div
@@ -277,7 +284,7 @@ export default function Hero() {
                 >
                   <h1 className="font-black leading-[0.87] tracking-[-0.04em]"
                     style={{
-                      fontSize: 'clamp(60px, 8.5vw, 118px)',
+                      fontSize: 'clamp(52px, 12vw, 118px)',
                       color: i < 2 ? '#FFFFFF' : 'transparent',
                       background: i === 2
                         ? 'linear-gradient(135deg, #00F5FF 0%, #0066FF 40%, #00AAFF 70%, #00F5FF 100%)'
@@ -294,25 +301,27 @@ export default function Hero() {
             ))}
 
             {/* Typed role */}
-            <motion.div className="text-xl md:text-2xl font-semibold mt-6 mb-5 h-9 flex items-center"
-              style={{ color: 'rgba(255,255,255,0.45)' }}
+            <motion.div
+              className="text-base sm:text-xl md:text-2xl font-semibold mt-4 sm:mt-6 mb-4 sm:mb-5 flex items-center"
+              style={{ color: 'rgba(255,255,255,0.45)', minHeight: 36 }}
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>
               Become a&nbsp;<TypedRole />
             </motion.div>
 
             {/* Description */}
-            <motion.p className="text-sm leading-relaxed mb-10 max-w-[440px]"
+            <motion.p
+              className="text-sm sm:text-base leading-relaxed mb-8 sm:mb-10 max-w-[480px]"
               style={{ color: 'rgba(148,185,255,0.45)' }}
               initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.3 }}>
               The most complete Blue Team roadmap ever built — 7 phases, 50+ topics, real-world tools, certifications and labs. Zero to SOC Professional.
             </motion.p>
 
             {/* CTAs */}
-            <motion.div className="flex flex-wrap gap-3 mb-12"
+            <motion.div className="flex flex-col sm:flex-row gap-3 mb-0 sm:mb-2"
               initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }}>
-              <div {...primaryMag}>
+              <div {...primaryMag} className="w-full sm:w-auto">
                 <button
-                  className="group relative overflow-hidden px-8 py-4 rounded-2xl text-sm font-bold text-white"
+                  className="group relative overflow-hidden w-full sm:w-auto px-7 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-sm font-bold text-white"
                   style={{
                     background: 'linear-gradient(135deg, #0044EE 0%, #0099FF 100%)',
                     boxShadow: '0 0 40px rgba(0,120,255,0.45), inset 0 1px 0 rgba(255,255,255,0.15)',
@@ -320,16 +329,16 @@ export default function Hero() {
                   onClick={() => document.querySelector('#roadmap')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                  <span className="relative flex items-center gap-2.5">
+                  <span className="relative flex items-center justify-center gap-2.5">
                     <span>⚡</span>
                     Start the Roadmap
                     <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
                   </span>
                 </button>
               </div>
-              <div {...secMag}>
+              <div {...secMag} className="w-full sm:w-auto">
                 <button
-                  className="px-8 py-4 rounded-2xl text-sm font-semibold transition-all duration-200"
+                  className="w-full sm:w-auto px-7 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-sm font-semibold transition-all duration-200"
                   style={{
                     background: 'rgba(0,245,255,0.05)',
                     border: '1px solid rgba(0,245,255,0.18)',
@@ -345,21 +354,16 @@ export default function Hero() {
               </div>
             </motion.div>
 
-            {/* Stats */}
-            <motion.div className="flex gap-3 flex-wrap"
+            {/* Stats — mobile version */}
+            <motion.div
               initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.6 }}>
-              {[
-                { val: '7',     label: 'Phases',    color: '#00F5FF' },
-                { val: '50+',   label: 'Topics',    color: '#0099FF' },
-                { val: '10+',   label: 'Certs',     color: '#A78BFA' },
-                { val: '$120K', label: 'Avg Salary', color: '#00FF88' },
-              ].map(s => <StatPill key={s.val} {...s} />)}
+              <MobileStats />
             </motion.div>
           </div>
         </div>
       </div>
 
-      {/* ── BOTTOM RIGHT — Mini terminal ── */}
+      {/* ── Terminal — desktop only ── */}
       <motion.div
         className="absolute bottom-16 right-6 z-20 w-72 hidden xl:block"
         initial={{ opacity: 0, x: 30, y: 20 }}
@@ -371,18 +375,13 @@ export default function Hero() {
 
       {/* ── Scroll indicator ── */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 cursor-pointer"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 cursor-pointer"
         animate={{ y: [0, 7, 0] }}
         transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
         onClick={() => document.querySelector('#what')?.scrollIntoView({ behavior: 'smooth' })}
       >
         <span className="text-[8px] font-mono text-white/15 uppercase tracking-[0.4em]">explore</span>
-        <div className="w-px h-10 bg-gradient-to-b from-cyan-400/25 to-transparent" />
-        <div className="w-4 h-4 rounded-full border border-cyan-400/20 flex items-center justify-center">
-          <motion.div className="w-1 h-1 rounded-full bg-cyan-400/60"
-            animate={{ y: [0, 3, 0], opacity: [1, 0.3, 1] }}
-            transition={{ repeat: Infinity, duration: 1.5 }} />
-        </div>
+        <div className="w-px h-8 bg-gradient-to-b from-cyan-400/25 to-transparent" />
       </motion.div>
     </section>
   )
