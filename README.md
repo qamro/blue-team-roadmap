@@ -1,6 +1,6 @@
 # 🛡️ Blue Team Cybersecurity Roadmap
 
-> The most complete Blue Team cybersecurity roadmap ever built — structured, visual, and actionable.
+> The most complete Blue Team cybersecurity roadmap ever built • structured, visual, and actionable.
 
 ![Blue Team Roadmap](https://img.shields.io/badge/Blue%20Team-Roadmap%202025-00F5FF?style=for-the-badge&logo=shield&logoColor=white)
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=white)
