@@ -38,7 +38,7 @@ const ALERTS = [
   { sev: 'MED',  col: '#FFD700', msg: 'LSASS Dump Attempt • T1003.001'     },
   { sev: 'HIGH', col: '#FF8800', msg: 'Kerberoasting Detected • AD-01'     },
   { sev: 'INFO', col: '#00F5FF', msg: 'Threat Hunt Complete • Clean'        },
-  { sev: 'CRIT', col: '#FF3333', msg: 'Ransomware IOC Blocked — Endpoint'  },
+  { sev: 'CRIT', col: '#FF3333', msg: 'Ransomware IOC Blocked • Endpoint'  },
 ]
 
 function AlertTicker() {
