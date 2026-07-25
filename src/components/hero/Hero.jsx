@@ -240,7 +240,7 @@ export default function Hero() {
         <div className="hidden md:flex items-center gap-4">
           <div className="text-[9px] font-mono text-slate-500">247 alerts today</div>
           <div className="w-px h-4 bg-white/10" />
-          <div className="text-[9px] font-mono text-green-400/50">94% MITRE coverage</div>
+          <div className="text-[9px] font-mono text-emerald-400">94% MITRE coverage</div>
         </div>
       </motion.div>
 
