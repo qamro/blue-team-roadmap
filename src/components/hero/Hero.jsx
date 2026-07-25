@@ -218,10 +218,10 @@ export default function Hero() {
           <span className="text-[9px] font-mono text-green-400/50 uppercase tracking-widest">SYSTEMS NOMINAL</span>
         </div>
         {/* Bottom labels */}
-        <div className="absolute bottom-4 left-6 text-[9px] font-mono text-cyan-400/20">
+        <div className="absolute bottom-4 left-6 text-[9px] font-mono text-cyan-400">
           SHIELDS: ACTIVE // THREAT_LVL: ELEVATED // IR_TEAM: STANDBY
         </div>
-        <div className="absolute bottom-4 right-6 text-[9px] font-mono text-cyan-400/20">
+        <div className="absolute bottom-4 right-6 text-[9px] font-mono text-cyan-400">
           LAT: 36.7°N // LON: 3.0°E // NODE: DZ-SOC-01
         </div>
         {/* Scan line */}
