@@ -376,7 +376,7 @@ export default function Hero() {
         transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
         onClick={() => document.querySelector('#what')?.scrollIntoView({ behavior: 'smooth' })}
       >
-        <span className="text-[8px] font-mono text-white/15 uppercase tracking-[0.4em]">explore</span>
+        <span className="text-[8px] font-mono text-slate-500 uppercase tracking-[0.4em]">explore</span>
         <div className="w-px h-10 bg-gradient-to-b from-cyan-400/25 to-transparent" />
         <div className="w-4 h-4 rounded-full border border-cyan-400/20 flex items-center justify-center">
           <motion.div className="w-1 h-1 rounded-full bg-cyan-400/60"
