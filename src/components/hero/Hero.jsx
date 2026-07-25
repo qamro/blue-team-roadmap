@@ -58,7 +58,7 @@ function AlertTicker() {
           transition={{ duration: 0.25 }}>
           <span className="w-1.5 h-1.5 rounded-full shrink-0 animate-pulse" style={{ background: a.col, boxShadow: `0 0 6px ${a.col}` }} />
           <span className="text-[10px] font-mono font-bold shrink-0" style={{ color: a.col }}>{a.sev}</span>
-          <span className="text-[10px] font-mono text-white/40 truncate max-w-[260px]">{a.msg}</span>
+          <span className="text-[10px] font-mono text-zinc-400 truncate max-w-[260px]">{a.msg}</span>
         </motion.div>
       </AnimatePresence>
     </div>
