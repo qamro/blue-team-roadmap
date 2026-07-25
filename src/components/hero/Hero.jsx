@@ -238,7 +238,7 @@ export default function Hero() {
         initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.6 }}>
         <AlertTicker />
         <div className="hidden md:flex items-center gap-4">
-          <div className="text-[9px] font-mono text-white/20">247 alerts today</div>
+          <div className="text-[9px] font-mono text-slate-500">247 alerts today</div>
           <div className="w-px h-4 bg-white/10" />
           <div className="text-[9px] font-mono text-green-400/50">94% MITRE coverage</div>
         </div>
