@@ -34,7 +34,7 @@ function TypedRole() {
 const ALERTS = [
   { sev: 'CRIT', col: '#FF3333', msg: 'APT29 Spearphishing • Finance Dept' },
   { sev: 'HIGH', col: '#FF8800', msg: 'Lateral Movement • DC01 Compromised' },
-  { sev: 'CRIT', col: '#FF3333', msg: 'Cobalt Strike C2 Beacon — WS-142'  },
+  { sev: 'CRIT', col: '#FF3333', msg: 'Cobalt Strike C2 Beacon • WS-142'  },
   { sev: 'MED',  col: '#FFD700', msg: 'LSASS Dump Attempt — T1003.001'     },
   { sev: 'HIGH', col: '#FF8800', msg: 'Kerberoasting Detected — AD-01'     },
   { sev: 'INFO', col: '#00F5FF', msg: 'Threat Hunt Complete — Clean'        },
