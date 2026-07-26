@@ -58,7 +58,7 @@ function AlertTicker() {
           transition={{ duration: 0.25 }}>
           <span className="w-1.5 h-1.5 rounded-full shrink-0 animate-pulse" style={{ background: a.col, boxShadow: `0 0 6px ${a.col}` }} />
           <span className="text-[10px] font-mono font-bold shrink-0" style={{ color: a.col }}>{a.sev}</span>
-          <span className="text-[10px] font-mono text-zinc-400 truncate max-w-[260px]">{a.msg}</span>
+          <span className="text-[10px] font-mono text-zinc-400 truncate max-w-[160px] sm:max-w-[200px] md:max-w-[260px]">{a.msg}</span>
         </motion.div>
       </AnimatePresence>
     </div>
@@ -68,7 +68,7 @@ function AlertTicker() {
 // ── Stat counter ──────────────────────────────────────────────
 function StatPill({ val, label, color = '#00F5FF' }) {
   return (
-    <div className="flex flex-col items-center px-5 py-3 rounded-xl border border-white/6"
+    <div className="flex flex-col items-center px-4 md:px-5 py-2.5 md:py-3 rounded-xl border border-white/6"
       style={{ background: 'rgba(0,10,30,0.6)', backdropFilter: 'blur(20px)' }}>
       <span className="text-xl font-black" style={{ color }}>{val}</span>
       <span className="text-[9px] font-mono text-white/30 uppercase tracking-wider mt-0.5">{label}</span>
@@ -182,7 +182,7 @@ export default function Hero() {
       {/* ── FULL-SCREEN 3D canvas (fills entire section) ── */}
       <div className="absolute inset-0 z-0">
         <Suspense fallback={
-          <div className="w-full h-full flex items-center justify-center">
+          <div className="w-full h-full flex items-center justify-center text-center px-4">
             <motion.div className="text-[11px] font-mono text-cyan-400/30 uppercase tracking-[0.3em]"
               animate={{ opacity: [0.3, 0.8, 0.3] }} transition={{ duration: 1.5, repeat: Infinity }}>
               INITIALIZING DEFENSE CORE...
@@ -209,19 +209,19 @@ export default function Hero() {
         <Corner pos="bl" />
         <Corner pos="br" />
         {/* Top labels */}
-        <div className="absolute top-4 left-6 text-[9px] font-mono text-cyan-400/25 uppercase tracking-[0.25em]">
+        <div className="absolute top-4 left-6 text-[9px] font-mono text-cyan-400/25 uppercase tracking-[0.25em] hidden md:block">
           BLUETEAM_OS // DEFENSE_CORE_v3.1
         </div>
-        <div className="absolute top-4 right-6 flex items-center gap-2">
+        <div className="absolute top-4 right-6 items-center gap-2 hidden md:flex">
           <motion.span className="w-1.5 h-1.5 rounded-full bg-green-400"
             animate={{ opacity: [1,0.3,1] }} transition={{ duration: 1.2, repeat: Infinity }} />
           <span className="text-[9px] font-mono text-green-400/50 uppercase tracking-widest">SYSTEMS NOMINAL</span>
         </div>
         {/* Bottom labels */}
-        <div className="absolute bottom-4 left-6 text-[9px] font-mono text-cyan-600">
+        <div className="absolute bottom-4 left-6 text-[9px] font-mono text-cyan-600 hidden md:block">
           SHIELDS: ACTIVE // THREAT_LVL: ELEVATED // IR_TEAM: STANDBY
         </div>
-        <div className="absolute bottom-4 right-6 text-[9px] font-mono text-cyan-600">
+        <div className="absolute bottom-4 right-6 text-[9px] font-mono text-cyan-600 hidden md:block">
           LAT: 36.7°N // LON: 3.0°E // NODE: DZ-SOC-01
         </div>
         {/* Scan line */}
@@ -233,7 +233,7 @@ export default function Hero() {
 
       {/* ── Top alert bar ── */}
       <motion.div
-        className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8 py-3 border-b border-cyan-500/8"
+        className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 md:px-8 py-3 border-b border-cyan-500/8"
         style={{ background: 'rgba(1,4,9,0.7)', backdropFilter: 'blur(20px)', paddingTop: 76 }}
         initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.6 }}>
         <AlertTicker />
@@ -254,7 +254,7 @@ export default function Hero() {
       {/* ── LEFT — Main text content ── */}
       <div className="absolute inset-0 z-20 flex items-center pointer-events-none"
         style={{ paddingTop: 120 }}>
-        <div className="max-w-7xl mx-auto px-8 w-full pointer-events-auto" style={{ paddingLeft: '5%' }}>
+        <div className="max-w-7xl mx-auto px-4 md:px-8 w-full pointer-events-auto" style={{ paddingLeft: '5%' }}>
           <div className="max-w-[560px]">
 
             {/* Badge */}
@@ -275,7 +275,7 @@ export default function Hero() {
                   animate={{ y: 0 }}
                   transition={{ delay: 0.6 + i * 0.14, duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  <h1 className="font-black leading-[0.87] tracking-[-0.04em]"
+                  <h1 className="font-black leading-[0.87] tracking-[-0.04em] max-md:!text-[clamp(40px,11vw,60px)]"
                     style={{
                       fontSize: 'clamp(60px, 8.5vw, 118px)',
                       color: i < 2 ? '#FFFFFF' : 'transparent',
@@ -312,7 +312,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }}>
               <div {...primaryMag}>
                 <button
-                  className="group relative overflow-hidden px-8 py-4 rounded-2xl text-sm font-bold text-white"
+                  className="group relative overflow-hidden px-6 md:px-8 py-3.5 md:py-4 rounded-2xl text-sm font-bold text-white"
                   style={{
                     background: 'linear-gradient(135deg, #0044EE 0%, #0099FF 100%)',
                     boxShadow: '0 0 40px rgba(0,120,255,0.45), inset 0 1px 0 rgba(255,255,255,0.15)',
@@ -329,7 +329,7 @@ export default function Hero() {
               </div>
               <div {...secMag}>
                 <button
-                  className="px-8 py-4 rounded-2xl text-sm font-semibold transition-all duration-200"
+                  className="px-6 md:px-8 py-3.5 md:py-4 rounded-2xl text-sm font-semibold transition-all duration-200"
                   style={{
                     background: 'rgba(0,245,255,0.05)',
                     border: '1px solid rgba(0,245,255,0.18)',
@@ -346,7 +346,7 @@ export default function Hero() {
             </motion.div>
 
             {/* Stats */}
-            <motion.div className="flex gap-3 flex-wrap"
+            <motion.div className="flex gap-2 md:gap-3 flex-wrap"
               initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.6 }}>
               {[
                 { val: '7',     label: 'Phases',    color: '#00F5FF' },
