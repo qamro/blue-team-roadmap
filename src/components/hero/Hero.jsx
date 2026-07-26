@@ -49,16 +49,16 @@ function AlertTicker() {
   }, [])
   const a = ALERTS[idx]
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3 max-md:gap-2">
       <span className="text-[9px] font-mono font-bold tracking-widest text-cyan-300 uppercase shrink-0 hidden sm:block">LIVE SOC</span>
       <div className="w-px h-3 bg-white/10 shrink-0 hidden sm:block" />
       <AnimatePresence mode="wait">
-        <motion.div key={idx} className="flex items-center gap-2"
+        <motion.div key={idx} className="flex items-center gap-2 max-md:gap-1.5"
           initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
           transition={{ duration: 0.25 }}>
           <span className="w-1.5 h-1.5 rounded-full shrink-0 animate-pulse" style={{ background: a.col, boxShadow: `0 0 6px ${a.col}` }} />
           <span className="text-[10px] font-mono font-bold shrink-0" style={{ color: a.col }}>{a.sev}</span>
-          <span className="text-[10px] font-mono text-zinc-400 truncate max-w-[160px] sm:max-w-[200px] md:max-w-[260px]">{a.msg}</span>
+          <span className="text-[10px] font-mono text-zinc-400 truncate max-w-[130px] sm:max-w-[200px] md:max-w-[260px]">{a.msg}</span>
         </motion.div>
       </AnimatePresence>
     </div>
@@ -68,10 +68,10 @@ function AlertTicker() {
 // ── Stat counter ──────────────────────────────────────────────
 function StatPill({ val, label, color = '#00F5FF' }) {
   return (
-    <div className="flex flex-col items-center px-4 md:px-5 py-2.5 md:py-3 rounded-xl border border-white/6"
+    <div className="flex flex-col items-center justify-center px-4 md:px-5 py-2.5 md:py-3 rounded-xl border border-white/6 max-md:w-full text-center"
       style={{ background: 'rgba(0,10,30,0.6)', backdropFilter: 'blur(20px)' }}>
-      <span className="text-xl font-black" style={{ color }}>{val}</span>
-      <span className="text-[9px] font-mono text-white/30 uppercase tracking-wider mt-0.5">{label}</span>
+      <span className="text-xl max-md:text-lg font-black leading-none" style={{ color }}>{val}</span>
+      <span className="text-[9px] font-mono text-white/30 uppercase tracking-wider mt-1">{label}</span>
     </div>
   )
 }
@@ -84,7 +84,7 @@ function Corner({ pos }) {
     bl: 'bottom-0 left-0 border-b-2 border-l-2 rounded-bl-xl',
     br: 'bottom-0 right-0 border-b-2 border-r-2 rounded-br-xl',
   }[pos]
-  return <div className={`absolute w-6 h-6 ${cls} border-cyan-400/30`} />
+  return <div className={`absolute w-6 h-6 max-md:w-4 max-md:h-4 ${cls} border-cyan-400/30`} />
 }
 
 // ── Floating metric card ──────────────────────────────────────
@@ -177,7 +177,7 @@ export default function Hero() {
   const secMag     = useMagnetic(0.15)
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ height: '100vh', minHeight: 700, background: '#010409' }}>
+    <section className="relative w-full overflow-hidden max-md:!h-[100svh]" style={{ height: '100vh', minHeight: 700, background: '#010409' }}>
 
       {/* ── FULL-SCREEN 3D canvas (fills entire section) ── */}
       <div className="absolute inset-0 z-0">
@@ -203,7 +203,7 @@ export default function Hero() {
       }} />
 
       {/* ── HUD frame overlay ── */}
-      <div className="absolute inset-4 z-10 pointer-events-none rounded-2xl">
+      <div className="absolute inset-4 max-md:inset-3 z-10 pointer-events-none rounded-2xl">
         <Corner pos="tl" />
         <Corner pos="tr" />
         <Corner pos="bl" />
@@ -233,7 +233,7 @@ export default function Hero() {
 
       {/* ── Top alert bar ── */}
       <motion.div
-        className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 md:px-8 py-3 border-b border-cyan-500/8"
+        className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 md:px-8 py-3 border-b border-cyan-500/8 max-md:!pt-[60px]"
         style={{ background: 'rgba(1,4,9,0.7)', backdropFilter: 'blur(20px)', paddingTop: 76 }}
         initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.6 }}>
         <AlertTicker />
@@ -252,17 +252,17 @@ export default function Hero() {
       <MetricCard icon="🔍" label="Threat Hunts"    value="12 Active"   sub="Hypotheses open" color="#00FF88" delay={2.8} x="77%" y="48%" />
 
       {/* ── LEFT — Main text content ── */}
-      <div className="absolute inset-0 z-20 flex items-center pointer-events-none"
+      <div className="absolute inset-0 z-20 flex items-center pointer-events-none max-md:!pt-[85px]"
         style={{ paddingTop: 120 }}>
-        <div className="max-w-7xl mx-auto px-4 md:px-8 w-full pointer-events-auto" style={{ paddingLeft: '5%' }}>
+        <div className="max-w-7xl mx-auto px-5 md:px-8 w-full pointer-events-auto max-md:!pl-5" style={{ paddingLeft: '5%' }}>
           <div className="max-w-[560px]">
 
             {/* Badge */}
-            <motion.div className="inline-flex items-center gap-2 mb-8 px-3 py-1.5 rounded-lg border border-cyan-500/20"
+            <motion.div className="inline-flex items-center gap-2 mb-6 md:mb-8 px-3 py-1.5 rounded-lg border border-cyan-500/20"
               style={{ background: 'rgba(0,245,255,0.05)', backdropFilter: 'blur(12px)' }}
               initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}>
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-              <span className="text-[10px] font-mono text-cyan-400/70 uppercase tracking-[0.2em]">
+              <span className="text-[10px] font-mono text-cyan-400/70 uppercase tracking-[0.2em] max-md:text-[9px]">
                 Blue Team Cybersecurity Roadmap 2025
               </span>
             </motion.div>
@@ -275,7 +275,7 @@ export default function Hero() {
                   animate={{ y: 0 }}
                   transition={{ delay: 0.6 + i * 0.14, duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  <h1 className="font-black leading-[0.87] tracking-[-0.04em] max-md:!text-[clamp(40px,11vw,60px)]"
+                  <h1 className="font-black leading-[0.87] tracking-[-0.04em] max-md:!text-[clamp(42px,12vw,60px)]"
                     style={{
                       fontSize: 'clamp(60px, 8.5vw, 118px)',
                       color: i < 2 ? '#FFFFFF' : 'transparent',
@@ -294,25 +294,25 @@ export default function Hero() {
             ))}
 
             {/* Typed role */}
-            <motion.div className="text-xl md:text-2xl font-semibold mt-6 mb-5 h-9 flex items-center"
+            <motion.div className="text-lg md:text-2xl font-semibold mt-5 md:mt-6 mb-4 md:mb-5 h-9 flex items-center"
               style={{ color: 'rgba(255,255,255,0.45)' }}
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>
               Become a&nbsp;<TypedRole />
             </motion.div>
 
             {/* Description */}
-            <motion.p className="text-sm leading-relaxed mb-10 max-w-[440px]"
+            <motion.p className="text-sm leading-relaxed mb-8 md:mb-10 max-w-[440px]"
               style={{ color: 'rgba(148,185,255,0.45)' }}
               initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.3 }}>
               The most complete Blue Team roadmap ever built: 7 phases, 50+ topics, real-world tools, certifications and labs. Zero to SOC Professional.
             </motion.p>
 
             {/* CTAs */}
-            <motion.div className="flex flex-wrap gap-3 mb-12"
+            <motion.div className="flex flex-wrap gap-3 mb-10 md:mb-12 max-md:flex-col w-full"
               initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }}>
-              <div {...primaryMag}>
+              <div {...primaryMag} className="max-md:w-full">
                 <button
-                  className="group relative overflow-hidden px-6 md:px-8 py-3.5 md:py-4 rounded-2xl text-sm font-bold text-white"
+                  className="group relative overflow-hidden px-6 md:px-8 py-3.5 md:py-4 rounded-2xl text-sm font-bold text-white max-md:w-full max-md:flex max-md:justify-center"
                   style={{
                     background: 'linear-gradient(135deg, #0044EE 0%, #0099FF 100%)',
                     boxShadow: '0 0 40px rgba(0,120,255,0.45), inset 0 1px 0 rgba(255,255,255,0.15)',
@@ -320,16 +320,16 @@ export default function Hero() {
                   onClick={() => document.querySelector('#roadmap')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                  <span className="relative flex items-center gap-2.5">
+                  <span className="relative flex items-center justify-center gap-2.5">
                     <span>⚡</span>
                     Start the Roadmap
                     <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
                   </span>
                 </button>
               </div>
-              <div {...secMag}>
+              <div {...secMag} className="max-md:w-full">
                 <button
-                  className="px-6 md:px-8 py-3.5 md:py-4 rounded-2xl text-sm font-semibold transition-all duration-200"
+                  className="px-6 md:px-8 py-3.5 md:py-4 rounded-2xl text-sm font-semibold transition-all duration-200 max-md:w-full text-center"
                   style={{
                     background: 'rgba(0,245,255,0.05)',
                     border: '1px solid rgba(0,245,255,0.18)',
@@ -346,7 +346,7 @@ export default function Hero() {
             </motion.div>
 
             {/* Stats */}
-            <motion.div className="flex gap-2 md:gap-3 flex-wrap"
+            <motion.div className="flex gap-3 flex-wrap max-md:grid max-md:grid-cols-2 max-md:gap-2.5 w-full pr-4 md:pr-0"
               initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.6 }}>
               {[
                 { val: '7',     label: 'Phases',    color: '#00F5FF' },
@@ -371,7 +371,7 @@ export default function Hero() {
 
       {/* ── Scroll indicator ── */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 cursor-pointer"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 cursor-pointer max-md:bottom-2 max-md:scale-75"
         animate={{ y: [0, 7, 0] }}
         transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
         onClick={() => document.querySelector('#what')?.scrollIntoView({ behavior: 'smooth' })}
