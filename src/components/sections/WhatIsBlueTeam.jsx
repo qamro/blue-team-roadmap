@@ -45,8 +45,7 @@ export default function WhatIsBlueTeam() {
     <section id="what" className="relative py-32 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 cyber-grid-bg opacity-50" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-32 bg-gradient-to-b from-transparent via-cyan-500/30 to-transparent" />
-
+      
       <div className="relative max-w-7xl mx-auto px-6">
         {/* Header */}
         <motion.div
